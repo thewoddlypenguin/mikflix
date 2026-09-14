@@ -1,0 +1,45 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+.badge--gold {
+  color: var(--gold-bright);
+  border-color: rgba(226, 169, 79, 0.5);
+  background: rgba(226, 169, 79, 0.12);
+}
+
+.badge--teal {
+  color: var(--teal);
+  border-color: rgba(94, 200, 184, 0.45);
+  background: rgba(94, 200, 184, 0.1);
+}
+
+.badge--ember {
+  color: #eda087;
+  border-color: rgba(217, 108, 79, 0.5);
+  background: rgba(217, 108, 79, 0.12);
+}
+
+.badge--lilac {
+  color: var(--lilac);
+  border-color: rgba(180, 147, 224, 0.45);
+  background: rgba(180, 147, 224, 0.1);
+}
+
+.badge--neutral {
+  color: var(--ink-mute);
+  border-color: var(--line-strong);
+  background: rgba(240, 222, 195, 0.05);
+}

@@ -1,0 +1,103 @@
+.copy-card {
+  position: relative;
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.copy-card:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+  transform: translateY(-2px);
+}
+
+.copy-card__spine {
+  width: 4px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, var(--gold), var(--gold-deep));
+  opacity: 0.75;
+}
+
+.copy-card__body {
+  padding: 14px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  flex: 1;
+}
+
+.copy-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.copy-card__format {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--gold-bright);
+}
+
+.copy-card__edition {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink-hi);
+  line-height: 1.3;
+}
+
+.copy-card__loc {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-mute);
+}
+
+.copy-card__loc em {
+  font-style: normal;
+  color: var(--ink);
+}
+
+.copy-card__glyph {
+  color: var(--teal);
+  font-size: 0.85rem;
+}
+
+.copy-card__raw {
+  font-size: 0.62rem;
+  color: var(--ink-faint);
+}
+
+.copy-card__notes {
+  font-size: 0.8rem;
+  color: var(--ink-mute);
+  border-left: 2px solid var(--line-strong);
+  padding-left: 10px;
+  font-style: italic;
+}
+
+.copy-card__foot {
+  margin-top: 2px;
+  font-size: 0.58rem;
+  opacity: 0.7;
+}
+
+/* compact (individual-copies grid) */
+.copy-card--compact .copy-card__body {
+  padding: 11px 13px 10px;
+  gap: 5px;
+}
+
+.copy-card--compact .copy-card__edition {
+  font-size: 0.85rem;
+}

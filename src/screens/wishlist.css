@@ -1,0 +1,122 @@
+.wl-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 34px;
+}
+
+.wl-title {
+  font-size: clamp(2rem, 3.6vw, 2.9rem);
+  margin-top: 6px;
+}
+
+.wl-sub {
+  color: var(--ink-mute);
+  font-size: 0.9rem;
+  max-width: 52ch;
+  margin-top: 6px;
+}
+
+.wl-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid rgba(94, 200, 184, 0.35);
+  border-radius: var(--r-md);
+  background: rgba(94, 200, 184, 0.06);
+  padding: 12px 22px;
+}
+
+.wl-stat__num {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--teal);
+  line-height: 1;
+}
+
+.wl-stat__label {
+  font-size: 0.58rem;
+  margin-top: 5px;
+}
+
+.wl-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 26px;
+}
+
+.wl-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-mute);
+  transition: all 0.2s;
+}
+
+.wl-group__label {
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.wl-group__count {
+  font-size: 0.6rem;
+  color: var(--ink-faint);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.wl-group:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.wl-group.is-active {
+  color: #1c130a;
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+  border-color: transparent;
+  box-shadow: 0 4px 18px -6px rgba(226, 169, 79, 0.5);
+}
+
+.wl-group.is-active .wl-group__count {
+  color: #5a3f16;
+  border-color: rgba(28, 19, 10, 0.35);
+}
+
+.wl-blurb {
+  margin-top: 14px;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+.wl-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.wl-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 44px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--line-strong);
+  color: var(--ink-faint);
+  font-size: 0.8rem;
+}
+
+.wl-foot svg {
+  color: var(--teal);
+  flex-shrink: 0;
+}

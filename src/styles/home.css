@@ -1,0 +1,230 @@
+/* ---------- hero ---------- */
+.hero {
+  position: relative;
+  min-height: clamp(440px, 58vw, 620px);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.hero__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero__backdrop .poster-canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  aspect-ratio: auto;
+}
+
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(15, 10, 8, 0.94) 0%, rgba(15, 10, 8, 0.72) 38%, rgba(15, 10, 8, 0.18) 72%),
+    linear-gradient(0deg, var(--bg-0) 2%, transparent 46%),
+    linear-gradient(180deg, rgba(15, 10, 8, 0.6) 0%, transparent 24%);
+}
+
+.hero__content {
+  position: relative;
+  z-index: 1;
+  max-width: var(--page-max);
+  width: 100%;
+  margin: 0 auto;
+  padding: 60px var(--pad-x) 44px;
+}
+
+.hero__title {
+  font-size: clamp(2rem, 4.6vw, 3.6rem);
+  max-width: 13em;
+  margin: 10px 0 12px;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+}
+
+.hero__meta {
+  font-size: 0.68rem;
+  color: var(--gold);
+  letter-spacing: 0.16em;
+}
+
+.hero__synopsis {
+  max-width: 56ch;
+  color: var(--ink);
+  font-size: 0.98rem;
+  margin-top: 14px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+
+/* ownership strip — the "do we have the good version" answer */
+.hero__ownership {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-width: 560px;
+  border-left: 2px solid var(--line-strong);
+  padding-left: 16px;
+}
+
+.hero__own-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--ink-mute);
+}
+
+.hero__own-row strong {
+  color: var(--ink-hi);
+  font-weight: 700;
+}
+
+.hero__own-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.hero__own-icon.owned {
+  color: var(--gold-bright);
+  background: rgba(226, 169, 79, 0.14);
+  border: 1px solid rgba(226, 169, 79, 0.4);
+}
+
+.hero__own-icon.neutral {
+  color: var(--ink-mute);
+  background: rgba(240, 222, 195, 0.06);
+  border: 1px solid var(--line-strong);
+}
+
+.hero__own-icon.wanted {
+  color: var(--teal);
+  background: rgba(94, 200, 184, 0.1);
+  border: 1px solid rgba(94, 200, 184, 0.4);
+}
+
+.hero__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 26px;
+  flex-wrap: wrap;
+}
+
+/* buttons (shared) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 11px 22px;
+  border-radius: 999px;
+  transition: transform 0.2s var(--ease-spring), box-shadow 0.2s, background 0.2s, color 0.2s;
+}
+
+.btn--primary {
+  color: #1c130a;
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+  box-shadow: 0 8px 26px -10px rgba(226, 169, 79, 0.6);
+}
+
+.btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -10px rgba(226, 169, 79, 0.7);
+}
+
+.btn--ghost {
+  color: var(--ink-hi);
+  background: rgba(18, 13, 11, 0.55);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(6px);
+}
+
+.btn--ghost:hover {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+  transform: translateY(-2px);
+}
+
+/* ---------- smart list strip ---------- */
+.smartlist {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.smartlist__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.smartlist__item::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.smartlist__item:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+  transform: translateY(-3px);
+}
+
+.smartlist__item:hover::after {
+  opacity: 1;
+}
+
+.smartlist__label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink-hi);
+}
+
+.smartlist__desc {
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+}
+
+.smartlist__arrow {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  color: var(--gold);
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.smartlist__item:hover .smartlist__arrow {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+@media (max-width: 640px) {
+  .hero__ownership {
+    display: none;
+  }
+}

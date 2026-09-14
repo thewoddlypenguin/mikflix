@@ -1,0 +1,27 @@
+.nf {
+  min-height: 62vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.nf__icon {
+  color: var(--gold-deep);
+}
+
+.nf__title {
+  font-size: clamp(4rem, 10vw, 7rem);
+  line-height: 1;
+  color: var(--gold);
+  opacity: 0.85;
+}
+
+.nf__body {
+  color: var(--ink-mute);
+  max-width: 38ch;
+  margin-bottom: 10px;
+}

@@ -1,0 +1,145 @@
+.wl-card {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  padding: 16px;
+  transition: border-color 0.25s, background 0.25s, transform 0.25s var(--ease-out);
+}
+
+.wl-card:hover {
+  border-color: rgba(94, 200, 184, 0.4);
+  background: var(--surface-2);
+  transform: translateY(-3px);
+}
+
+.wl-card__poster {
+  position: relative;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.wl-card__poster .poster-canvas {
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s var(--ease-out);
+}
+
+.wl-card:hover .poster-canvas {
+  transform: scale(1.04);
+}
+
+.wl-card__veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(10, 7, 5, 0.55));
+}
+
+.wl-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 2px 4px;
+}
+
+.wl-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.wl-card__priority {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.wl-card__priority--high {
+  color: var(--ember);
+}
+
+.wl-card__priority--medium {
+  color: var(--gold);
+}
+
+.wl-card__title {
+  font-family: var(--font-display);
+  font-size: 1.18rem;
+  font-weight: 600;
+  color: var(--ink-hi);
+  line-height: 1.2;
+}
+
+.wl-card__title:hover {
+  color: var(--teal);
+}
+
+.wl-card__edition {
+  font-size: 0.64rem;
+  color: var(--teal);
+}
+
+.wl-card__context {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+
+.wl-card__context svg {
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+.wl-card__reason {
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--ink-mute);
+  border-left: 2px solid rgba(94, 200, 184, 0.35);
+  padding-left: 10px;
+}
+
+.wl-card__foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.wl-card__foot .mono {
+  font-size: 0.6rem;
+}
+
+.wl-card__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--teal);
+  transition: gap 0.18s;
+}
+
+.wl-card__more:hover {
+  gap: 9px;
+}
+
+@media (max-width: 620px) {
+  .wl-card {
+    grid-template-columns: 110px 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+}

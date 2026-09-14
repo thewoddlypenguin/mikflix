@@ -1,0 +1,79 @@
+.library__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 34px;
+  margin-bottom: 22px;
+}
+
+.library__title {
+  font-size: clamp(2rem, 3.6vw, 2.9rem);
+  margin-top: 6px;
+}
+
+.library__sub {
+  color: var(--ink-mute);
+  font-size: 0.9rem;
+  max-width: 52ch;
+  margin-top: 6px;
+}
+
+.library__controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.library__filter-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--ink-hi);
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: rgba(18, 13, 11, 0.6);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.library__filter-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+}
+
+.library__filter-dot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--teal);
+  border: 2px solid var(--bg-0);
+}
+
+.library__grid {
+  margin-top: 26px;
+}
+
+.library__grid--titles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+  gap: 26px 18px;
+}
+
+.library__grid--copies {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.library__copy-link {
+  display: block;
+  border-radius: var(--r-md);
+}

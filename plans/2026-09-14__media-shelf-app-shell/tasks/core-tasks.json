@@ -1,0 +1,32 @@
+[
+  {
+    "content": "[setup-scaffold] Scaffold Vite+React+TS app, deps (react-router, motion, lucide-react), git init",
+    "id": "1",
+    "status": "in_progress"
+  },
+  {
+    "content": "[core-theme] Theme tokens, fonts, grain/atmosphere, UI primitives (Badge, Chip, Poster, ToggleGroup, EmptyState, Reveal)",
+    "id": "2",
+    "status": "pending"
+  },
+  {
+    "content": "[data-mock] Mock data model + 20-title dataset + selectors/filtering lib",
+    "id": "3",
+    "status": "pending"
+  },
+  {
+    "content": "[shell-home] App shell (header/nav/search/footer/router) + Home hero + category rows",
+    "id": "4",
+    "status": "pending"
+  },
+  {
+    "content": "[screens] Library (filters/sort/toggles/chips) + Title Detail + Wishlist + Admin screens",
+    "id": "5",
+    "status": "pending"
+  },
+  {
+    "content": "[verify-polish] Wire-up, polish pass, npm build verify, dev-server smoke test, start script, commits",
+    "id": "6",
+    "status": "pending"
+  }
+]
