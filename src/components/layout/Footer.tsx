@@ -8,7 +8,7 @@ export function Footer() {
     <footer className="site-footer">
       <div className="site-footer__inner">
         <p className="site-footer__stamp">
-          <span className="mono">THE SHELFMARK</span>
+          <span className="mono">MIKFLIX</span>
           <span className="site-footer__dot">·</span>
           <span className="mono">A PRIVATE COLLECTION · NOT FOR CIRCULATION</span>
         </p>

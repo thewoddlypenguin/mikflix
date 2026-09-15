@@ -1,4 +1,4 @@
-# Plan: Personal Physical Media Library — App Shell (Mock Data Phase)
+# Plan: Mikflix (My Movie Database) — App Shell (Mock Data Phase)
 
 ## Goal
 Production-minded front-end app shell for browsing a personal physical media

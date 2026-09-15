@@ -1,5 +1,5 @@
 @echo off
-REM The Shelfmark — dev server
+REM Mikflix — dev server
 REM APP_PORT is provided by the environment; falls back to 5173.
 if "%APP_PORT%"=="" set APP_PORT=5173
 cd /d "%~dp0"

@@ -45,7 +45,7 @@ export function Header() {
   return (
     <header className={`site-header ${scrolled ? 'is-scrolled' : ''}`}>
       <div className="site-header__inner">
-        <Link to="/" className="brand" aria-label="The Shelfmark — home">
+        <Link to="/" className="brand" aria-label="Mikflix — home">
           <svg className="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
             <rect x="6" y="7" width="5.5" height="18" rx="1.5" fill="#e2a94f" />
             <rect x="13.5" y="10" width="5.5" height="15" rx="1.5" fill="#c88a36" />
@@ -53,7 +53,7 @@ export function Header() {
             <rect x="5" y="25.5" width="22" height="1.8" rx="0.9" fill="#5ec8b8" />
           </svg>
           <span className="brand__name">
-            The Shelfmark
+            Mikflix
             <span className="brand__sub">Family Media Library</span>
           </span>
         </Link>
