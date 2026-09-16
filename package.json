@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "db:import": "python data/scripts/import_seed.py",
-    "db:fresh": "python data/scripts/import_seed.py --fresh"
+    "db:fresh": "python data/scripts/import_seed.py --fresh",
+    "db:export": "python data/scripts/export_bundle.py"
   },
   "dependencies": {
     "lucide-react": "^0.510.0",

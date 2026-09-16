@@ -6,6 +6,7 @@ import './Header.css'
 const NAV = [
   { to: '/', label: 'Home' },
   { to: '/library', label: 'Library' },
+  { to: '/inventory', label: 'Inventory' },
   { to: '/wishlist', label: 'Wishlist' },
   { to: '/admin', label: 'Manage', end: true },
 ]
