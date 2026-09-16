@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { SlidersHorizontal, SearchX } from 'lucide-react'
-import { mockTitles } from '../data/mock'
+import { allTitles } from '../data'
 import { summarizeAll } from '../lib/summaries'
 import {
   emptyFilters,
@@ -17,7 +17,7 @@ import type { LibraryView } from '../components/library/ViewToggle'
 import type { Facets } from '../components/library/FilterDrawer'
 import './library.css'
 
-const allSummaries = summarizeAll(mockTitles)
+const allSummaries = summarizeAll(allTitles)
 
 const PRESETS: Record<string, Partial<ActiveFilters>> = {
   'family-night': { genres: ['Family'], types: ['film'] },
@@ -37,7 +37,7 @@ function useFacets(): Facets {
     const containers = new Set<string>()
     let yearMin = Infinity
     let yearMax = -Infinity
-    for (const t of mockTitles) {
+    for (const t of allTitles) {
       t.genres.forEach(g => genres.add(g))
       t.copies.forEach(c => {
         formats.add(c.format)
@@ -121,7 +121,7 @@ export function Library() {
 
   // ----- selection -----
   const filtered = useMemo(() => {
-    const items = allSummaries.map(summary => ({ summary, title: mockTitles.find(t => t.id === summary.id)! }))
+    const items = allSummaries.map(summary => ({ summary, title: allTitles.find(t => t.id === summary.id)! }))
     return items.filter(({ title }) => matchesFilters(title, filters))
   }, [filters])
 

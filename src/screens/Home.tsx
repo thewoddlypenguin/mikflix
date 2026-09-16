@@ -1,22 +1,31 @@
 import { Link, useNavigate } from 'react-router'
 import { Play, MapPin, BookmarkPlus, Sparkles, ArrowRight } from 'lucide-react'
-import { mockTitles } from '../data/mock'
+import { allTitles } from '../data'
 import { featuredTitleId, homeCategories, smartLists } from '../data/categories'
 import { summarizeAll } from '../lib/summaries'
 import { Poster, Reveal } from '../components/ui'
 import { CollectionRow, TitleCard } from '../components/collection'
 import { upper, storageAbbr } from '../lib/format'
+import type { MediaTitle } from '../data/types'
 import '../styles/home.css'
 
-const allSummaries = summarizeAll(mockTitles)
+const allSummaries = summarizeAll(allTitles)
 const summariesById = new Map(allSummaries.map(s => [s.id, s]))
+
+/** Featured title: most copies owned (ties → alphabetical). Falls back to the mock feature if present. */
+function pickFeatured(): MediaTitle {
+  const byId = allTitles.find(t => t.id === featuredTitleId)
+  if (byId) return byId
+  return [...allTitles].sort(
+    (a, b) => b.copies.length - a.copies.length || a.title.localeCompare(b.title),
+  )[0]
+}
 
 function HomeHero() {
   const navigate = useNavigate()
-  const featured = mockTitles.find(t => t.id === featuredTitleId)!
-  const box = featured.copies.find(c => c.boxSet)!
-  const binder = featured.copies.find(c => c.copyType === 'binder-disc')!
-  const wl = featured.wishlist!
+  const featured = pickFeatured()
+  const ownedRows = featured.copies.slice(0, 2)
+  const wl = featured.wishlist
 
   return (
     <section className="hero" aria-label="Featured title">
@@ -41,45 +50,50 @@ function HomeHero() {
         </Reveal>
         <Reveal delay={160}>
           <p className="hero__meta mono">
-            {featured.year} · {featured.rating} · {upper(featured.runtime)} ·{' '}
-            {featured.genres.join(' / ')}
+            {featured.year || '—'} · {featured.rating} · {upper(featured.runtime)}
+            {featured.genres.length ? ` · ${featured.genres.join(' / ')}` : ''}
           </p>
         </Reveal>
         <Reveal delay={220}>
-          <p className="hero__synopsis">{featured.synopsis}</p>
+          {featured.synopsis ? (
+            <p className="hero__synopsis">{featured.synopsis}</p>
+          ) : (
+            <p className="hero__synopsis">
+              {featured.copies.length} {featured.copies.length === 1 ? 'copy' : 'copies'} on the
+              shelf{featured.franchise ? ` — part of ${featured.franchise}` : ''}.
+            </p>
+          )}
         </Reveal>
 
-        <Reveal delay={280}>
-          <div className="hero__ownership">
-            <div className="hero__own-row">
-              <span className="hero__own-icon owned">
-                <MapPin size={13} />
-              </span>
-              <span>
-                <strong>{box.editionName}</strong> — {storageAbbr(box.storageType)}{' '}
-                {box.locationLabel}
-              </span>
+        {ownedRows.length > 0 && (
+          <Reveal delay={280}>
+            <div className="hero__ownership">
+              {ownedRows.map(c => (
+                <div className="hero__own-row" key={c.copyId}>
+                  <span className="hero__own-icon owned">
+                    <MapPin size={13} />
+                  </span>
+                  <span>
+                    <strong>{c.editionName}</strong> — {storageAbbr(c.storageType)}
+                    {c.containerName ? ` ${c.containerName}` : ''}
+                    {c.locationLabel ? ` ${c.locationLabel}` : ''}
+                  </span>
+                </div>
+              ))}
+              {wl && (
+                <div className="hero__own-row">
+                  <span className="hero__own-icon wanted">
+                    <BookmarkPlus size={13} />
+                  </span>
+                  <span>
+                    Want the <strong>{wl.desiredEdition}</strong>
+                    {wl.reason ? ` — ${wl.reason.toLowerCase()}` : ''}
+                  </span>
+                </div>
+              )}
             </div>
-            <div className="hero__own-row">
-              <span className="hero__own-icon neutral">
-                <MapPin size={13} />
-              </span>
-              <span>
-                <strong>{binder.editionName}</strong> — {binder.containerName}{' '}
-                {binder.locationLabel}
-              </span>
-            </div>
-            <div className="hero__own-row">
-              <span className="hero__own-icon wanted">
-                <BookmarkPlus size={13} />
-              </span>
-              <span>
-                Want the <strong>{wl.desiredEdition}</strong>
-                {wl.reason ? ` — ${wl.reason.toLowerCase()}` : ''}
-              </span>
-            </div>
-          </div>
-        </Reveal>
+          </Reveal>
+        )}
 
         <Reveal delay={340}>
           <div className="hero__actions">
@@ -87,9 +101,9 @@ function HomeHero() {
               <Play size={15} />
               Open Title Page
             </button>
-            <button className="btn btn--ghost" onClick={() => navigate('/library?flag=box-set')}>
+            <button className="btn btn--ghost" onClick={() => navigate('/inventory')}>
               <Sparkles size={15} />
-              Browse Box Sets
+              Browse the Collection
             </button>
           </div>
         </Reveal>

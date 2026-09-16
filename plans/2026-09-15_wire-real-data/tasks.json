@@ -1,0 +1,27 @@
+[
+  {
+    "content": "[wire-1] Create src/data/adapter.ts (generated JSON → MediaTitle)",
+    "id": "wire-1",
+    "status": "pending"
+  },
+  {
+    "content": "[wire-2] Create src/data/index.ts exporting allTitles",
+    "id": "wire-2",
+    "status": "pending"
+  },
+  {
+    "content": "[wire-3] Replace mockTitles with allTitles in all screens/components",
+    "id": "wire-3",
+    "status": "pending"
+  },
+  {
+    "content": "[wire-4] Clear recencyIndex + addedLabel stamps in collection.ts",
+    "id": "wire-4",
+    "status": "pending"
+  },
+  {
+    "content": "[wire-5] Verify build + Library renders real data; commit",
+    "id": "wire-5",
+    "status": "pending"
+  }
+]

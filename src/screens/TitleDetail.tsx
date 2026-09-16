@@ -8,7 +8,7 @@ import {
   ArrowUpNarrowWide,
   TriangleAlert,
 } from 'lucide-react'
-import { mockTitles } from '../data/mock'
+import { allTitles } from '../data'
 import { summarizeTitle } from '../lib/summaries'
 import { addedLabel, ownedCopies } from '../lib/collection'
 import { Badge, Poster, wishlistBadge } from '../components/ui'
@@ -19,7 +19,7 @@ import './titleDetail.css'
 export function TitleDetail() {
   const { titleId } = useParams()
   const navigate = useNavigate()
-  const title = mockTitles.find(t => t.id === titleId)
+  const title = allTitles.find(t => t.id === titleId)
 
   if (!title) {
     return (
@@ -222,7 +222,7 @@ export function TitleDetail() {
             </Link>
           </header>
           <div className="td-nearby">
-            {mockTitles
+            {allTitles
               .filter(
                 t =>
                   t.id !== title.id &&

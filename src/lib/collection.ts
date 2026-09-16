@@ -83,17 +83,8 @@ function flagMatches(title: MediaTitle, flag: string): boolean {
   }
 }
 
-/** Stable recency ordering derived from the dataset (no dates in mock data) */
-const recencyIndex = new Map<string, number>([
-  ['smallville', 0],
-  ['eyes-wide-shut', 1],
-  ['hans-zimmer-live', 2],
-  ['voltron', 3],
-  ['lost', 4],
-  ['practical-magic', 5],
-  ['hamlet', 6],
-  ['beauty-beast', 7],
-])
+/** Stable recency ordering — cleared until real timestamps exist (imported batches) */
+const recencyIndex = new Map<string, number>()
 
 export function recencyRank(id: string): number {
   return recencyIndex.get(id) ?? 99
@@ -145,16 +136,9 @@ export function sortSummaries(
   }
 }
 
-/** Rough stamp of when a title entered the collection, for detail-page flavor */
-export function addedLabel(id: string): string {
-  const stamps: Record<string, string> = {
-    smallville: 'Aug 2026',
-    'eyes-wide-shut': 'Jul 2026',
-    'hans-zimmer-live': 'Jun 2026',
-    voltron: 'May 2026',
-    lost: 'Feb 2026',
-  }
-  return stamps[id] ?? 'Earlier logs'
+/** Rough stamp of when a title entered the collection — cleared until real timestamps exist */
+export function addedLabel(_id: string): string {
+  return 'Earlier logs'
 }
 
 export function ownedCopies(title: MediaTitle): MediaCopy[] {

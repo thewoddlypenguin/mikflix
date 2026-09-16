@@ -1,5 +1,5 @@
 import { Lock, FileUp, Film, PackagePlus, Pencil, TriangleAlert } from 'lucide-react'
-import { mockTitles } from '../data/mock'
+import { allTitles } from '../data'
 import { summarizeAll } from '../lib/summaries'
 import { Badge } from '../components/ui'
 import './admin.css'
@@ -38,7 +38,7 @@ const PLACEHOLDERS = [
 ]
 
 export function Admin() {
-  const uncertain = summarizeAll(mockTitles).filter(s => s.hasUncertainMatch)
+  const uncertain = summarizeAll(allTitles).filter(s => s.hasUncertainMatch)
 
   return (
     <div className="page admin">

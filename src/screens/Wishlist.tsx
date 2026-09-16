@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { BookmarkPlus, SearchX } from 'lucide-react'
-import { mockTitles } from '../data/mock'
+import { allTitles } from '../data'
 import { summarizeAll } from '../lib/summaries'
 import { Reveal, EmptyState } from '../components/ui'
 import { WishlistCard } from '../components/collection'
@@ -21,11 +21,11 @@ export function Wishlist() {
   const [group, setGroup] = useState<WishlistType | 'all'>('all')
 
   const entries = useMemo(() => {
-    return summarizeAll(mockTitles)
+    return summarizeAll(allTitles)
       .filter(s => s.hasWishlist)
       .map(summary => ({
         summary,
-        entry: mockTitles.find(t => t.id === summary.id)!.wishlist!,
+        entry: allTitles.find(t => t.id === summary.id)!.wishlist!,
       }))
   }, [])
 
