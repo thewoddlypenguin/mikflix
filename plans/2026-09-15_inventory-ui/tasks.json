@@ -1,0 +1,32 @@
+[
+  {
+    "content": "[inv-1] Pull latest main, create feat/inventory-ui branch",
+    "id": "inv-1",
+    "status": "completed"
+  },
+  {
+    "content": "[inv-2] Write db:export script → src/data/generated/titles.json + npm script",
+    "id": "inv-2",
+    "status": "completed"
+  },
+  {
+    "content": "[inv-3] Inventory data layer (typed loader for the bundle)",
+    "id": "inv-3",
+    "status": "completed"
+  },
+  {
+    "content": "[inv-4] Inventory screen: poster grid + search + type/format filters, URL-synced",
+    "id": "inv-4",
+    "status": "completed"
+  },
+  {
+    "content": "[inv-5] Wire route + Header nav",
+    "id": "inv-5",
+    "status": "completed"
+  },
+  {
+    "content": "[inv-6] Verify build + dev server, commit locally",
+    "id": "inv-6",
+    "status": "in_progress"
+  }
+]

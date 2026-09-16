@@ -1,0 +1,233 @@
+/* ============================================================
+   INVENTORY — real-data poster grid (batch 1)
+   Shares tokens with theme.css; poster-led, shelf-warm.
+   ============================================================ */
+
+.inventory {
+  padding: 40px var(--pad-x) 64px;
+  max-width: var(--page-max);
+  margin: 0 auto;
+}
+
+/* ---------- head ---------- */
+
+.inventory__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.inventory__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+
+.inventory__title {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 5vw, 52px);
+  font-weight: 600;
+  line-height: 1.05;
+  color: var(--ink-hi);
+  margin: 0;
+}
+
+.inventory__sub {
+  color: var(--ink-mute);
+  margin: 10px 0 0;
+  font-size: 15px;
+}
+
+.inventory__search input {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  color: var(--ink-hi);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 11px 16px;
+  width: min(320px, 70vw);
+  outline: none;
+  transition: border-color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+}
+
+.inventory__search input:focus {
+  border-color: var(--gold-deep);
+  background: var(--surface-2);
+}
+
+.inventory__search input::placeholder {
+  color: var(--ink-faint);
+}
+
+/* ---------- toolbar ---------- */
+
+.inventory__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.inventory__types {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.inventory__formats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.inventory__sort {
+  display: flex;
+}
+
+/* ---------- active filter chips ---------- */
+
+.inventory__active {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 14px 0 0;
+}
+
+.inventory__clear {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink-mute);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 2px 4px;
+}
+
+.inventory__clear:hover {
+  color: var(--ember);
+}
+
+/* ---------- count line ---------- */
+
+.inventory__count {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--ink-faint);
+  margin: 18px 0 20px;
+}
+
+/* ---------- grid ---------- */
+
+.inventory__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 26px 20px;
+}
+
+/* ---------- card ---------- */
+
+.inv-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inv-card__frame {
+  position: relative;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+}
+
+.inv-card:hover .inv-card__frame {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+}
+
+.inv-card__badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.inv-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 2px;
+}
+
+.inv-card__title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-hi);
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.inv-card__sub {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- footer ---------- */
+
+.inventory__foot {
+  margin-top: 48px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 640px) {
+  .inventory__head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inventory__search input {
+    width: 100%;
+  }
+
+  .inventory__formats {
+    margin-left: 0;
+  }
+
+  .inventory__grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 20px 14px;
+  }
+}
