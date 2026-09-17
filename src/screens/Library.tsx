@@ -63,12 +63,22 @@ export function Library() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let cancelled = false
     fetch('/titles.json')
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error(`titles.json ${r.status}`)
+        return r.json()
+      })
       .then(bundle => {
+        if (cancelled) return
         setTitles(loadTitles(bundle))
         setLoading(false)
       })
+      .catch(err => {
+        console.error('Failed to load titles.json:', err)
+        if (!cancelled) setLoading(false)
+      })
+    return () => { cancelled = true }
   }, [])
 
   const allSummaries = summarizeAll(titles)
@@ -137,7 +147,9 @@ export function Library() {
   const filtered = useMemo(() => {
     const items = allSummaries.map(summary => ({ summary, title: titles.find((t: import('../data/types').MediaTitle) => t.id === summary.id)! }))
     return items.filter(({ title }) => matchesFilters(title, filters))
-  }, [filters])
+    // `titles` must be a dep: allSummaries derives from the async fetch, and
+    // without it this memo stays cached on the empty pre-fetch result.
+  }, [filters, titles])
 
   const sorted = useMemo(() => {
     const arr = [...filtered]
