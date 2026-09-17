@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { SlidersHorizontal, SearchX } from 'lucide-react'
-import { mockTitles } from '../data/mock'
+import { loadTitles } from '../lib/data-adapter'
+
 import { summarizeAll } from '../lib/summaries'
 import {
   emptyFilters,
@@ -17,7 +18,6 @@ import type { LibraryView } from '../components/library/ViewToggle'
 import type { Facets } from '../components/library/FilterDrawer'
 import './library.css'
 
-const allSummaries = summarizeAll(mockTitles)
 
 const PRESETS: Record<string, Partial<ActiveFilters>> = {
   'family-night': { genres: ['Family'], types: ['film'] },
@@ -30,16 +30,16 @@ const PRESETS: Record<string, Partial<ActiveFilters>> = {
 }
 
 /** Derive faceted options from the dataset */
-function useFacets(): Facets {
+function useFacets(titles: import('../data/types').MediaTitle[]): Facets {
   return useMemo(() => {
     const genres = new Set<string>()
     const formats = new Set<string>()
     const containers = new Set<string>()
     let yearMin = Infinity
     let yearMax = -Infinity
-    for (const t of mockTitles) {
-      t.genres.forEach(g => genres.add(g))
-      t.copies.forEach(c => {
+    for (const t of titles) {
+      t.genres.forEach((g: string) => genres.add(g))
+      t.copies.forEach((c: MediaCopy) => {
         formats.add(c.format)
         if (c.containerName) containers.add(c.containerName)
       })
@@ -54,12 +54,26 @@ function useFacets(): Facets {
       yearMin,
       yearMax,
     }
-  }, [])
+  }, [titles])
 }
 
 export function Library() {
+
+  const [titles, setTitles] = useState<import('../data/types').MediaTitle[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/titles.json')
+      .then(r => r.json())
+      .then(bundle => {
+        setTitles(loadTitles(bundle))
+        setLoading(false)
+      })
+  }, [])
+
+  const allSummaries = summarizeAll(titles)
   const [params, setParams] = useSearchParams()
-  const facets = useFacets()
+  const facets = useFacets(titles)
 
   const [drawerOpen, setDrawerOpen] = useState(false)
   const view = (params.get('view') as LibraryView) || 'titles'
@@ -121,7 +135,7 @@ export function Library() {
 
   // ----- selection -----
   const filtered = useMemo(() => {
-    const items = allSummaries.map(summary => ({ summary, title: mockTitles.find(t => t.id === summary.id)! }))
+    const items = allSummaries.map(summary => ({ summary, title: titles.find((t: import('../data/types').MediaTitle) => t.id === summary.id)! }))
     return items.filter(({ title }) => matchesFilters(title, filters))
   }, [filters])
 
@@ -152,6 +166,12 @@ export function Library() {
     filters.storage.length > 0 ||
     filters.containers.length > 0 ||
     filters.flags.length > 0
+
+  if (loading) return (
+    <div className="page library" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+      <p style={{ color: 'var(--text-muted, #888)' }}>Loading library…</p>
+    </div>
+  )
 
   return (
     <div className="page library">

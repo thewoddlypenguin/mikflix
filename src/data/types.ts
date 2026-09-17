@@ -1,6 +1,6 @@
 export type MediaType = 'film' | 'tv' | 'music'
 
-export type StorageType = 'drawer' | 'binder' | 'shelf'
+export type StorageType = 'drawer' | 'binder' | 'shelf' | 'digital'
 
 export type Format =
   | '4K UHD'

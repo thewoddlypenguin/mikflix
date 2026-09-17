@@ -1,8 +1,6 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { Clapperboard, Tv, Music, SearchX, LibraryBig } from 'lucide-react'
-import { inventoryTitles, bundleGeneratedAt } from '../data/inventory'
-import type { InventoryTitle } from '../data/inventory'
 import { Badge, Chip, EmptyState, Poster, Reveal, ToggleGroup } from '../components/ui'
 import { hashSeed } from '../lib/format'
 import './inventory.css'
@@ -81,7 +79,46 @@ function badgeFor(t: InventoryTitle): { label: string; tone: 'gold' | 'teal' | '
 
 /* ---------- screen ---------- */
 
+interface InventoryTitle {
+  id: string
+  display_title: string
+  media_type: 'movie' | 'tv' | 'music'
+  franchise: string | null
+  release_year: number | null
+  match_status: string
+  match_confidence: string | null
+  copy_count: number
+  formats: string[]
+  storage_types: string[]
+  season_sets: string[]
+  containers: string[]
+  copies: {
+    entry_id: string | null
+    format: string | null
+    storage_type: string
+    container_name: string | null
+    slot_start: number | null
+    slot_end: number | null
+    location_detail: string | null
+    notes: string | null
+    disc_count: number | null
+    [key: string]: unknown
+  }[]
+}
+
 export function Inventory() {
+  const [inventoryTitles, setInventoryTitles] = useState<InventoryTitle[]>([])
+  const [bundleGeneratedAt, setBundleGeneratedAt] = useState<string>('')
+
+  useEffect(() => {
+    fetch('/titles.json')
+      .then(r => r.json())
+      .then(d => {
+        setInventoryTitles(d.titles ?? [])
+        setBundleGeneratedAt(d.generated_at ?? '')
+      })
+      .catch(console.error)
+  }, [])
   const [params, setParams] = useSearchParams()
   const searchRef = useRef<HTMLInputElement>(null)
 

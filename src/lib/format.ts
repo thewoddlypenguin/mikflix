@@ -1,11 +1,11 @@
-import type { MediaTitle, StorageType } from '../data/types'
+import type { MediaTitle } from '../data/types'
 
 /** Uppercase strings for location stamping */
-export function upper(s: string): string {
-  return s.toUpperCase()
+export function upper(s: string | null | undefined): string {
+  return (s ?? '').toUpperCase()
 }
 
-export function storageAbbr(s: StorageType): string {
+export function storageAbbr(s: string): string {
   switch (s) {
     case 'drawer':
       return 'DRAWER'
@@ -13,10 +13,14 @@ export function storageAbbr(s: StorageType): string {
       return 'BINDER'
     case 'shelf':
       return 'SHELF'
+    case 'discgear':
+      return 'DISC'
+    default:
+      return s.toUpperCase()
   }
 }
 
-export function storageGlyph(s: StorageType): string {
+export function storageGlyph(s: string): string {
   switch (s) {
     case 'drawer':
       return '▤'
@@ -24,6 +28,10 @@ export function storageGlyph(s: StorageType): string {
       return '⌗'
     case 'shelf':
       return '▥'
+    case 'discgear':
+      return '◉'
+    default:
+      return '▪'
   }
 }
 

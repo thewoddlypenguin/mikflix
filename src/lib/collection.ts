@@ -50,6 +50,7 @@ export const STORAGE_LABELS: Record<string, string> = {
   drawer: 'Drawer',
   binder: 'Binder',
   shelf: 'Shelf',
+  digital: 'Digital',
 }
 
 function flagMatches(title: MediaTitle, flag: string): boolean {
