@@ -193,8 +193,16 @@ titles.sort((a, b) => {
 
 mkdirSync(outDir, { recursive: true })
 const bundle = { schema: '1.1.0', generated_at: new Date().toISOString(), titles }
-writeFileSync(outPath, JSON.stringify(bundle, null, 2), 'utf8')
+const bundleJson = JSON.stringify(bundle, null, 2)
+writeFileSync(outPath, bundleJson, 'utf8')
 console.log(`✅ Wrote ${titles.length} titles to ${outPath}`)
+
+// Mirror the bundle to public/ so `vite dev` and `vite build` both serve
+// /titles.json without a post-build copy step.
+const publicDir = join(ROOT, 'public')
+mkdirSync(publicDir, { recursive: true })
+writeFileSync(join(publicDir, 'titles.json'), bundleJson, 'utf8')
+console.log(`✅ Mirrored to ${join(publicDir, 'titles.json')}`)
 
 const digital  = titles.filter(t => t.storage_types.includes('digital')).length
 const both     = titles.filter(t => t.storage_types.includes('digital') && t.storage_types.length > 1).length

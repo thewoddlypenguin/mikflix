@@ -79,6 +79,24 @@ function badgeFor(t: InventoryTitle): { label: string; tone: 'gold' | 'teal' | '
 
 /* ---------- screen ---------- */
 
+/**
+ * Extracted from the inline copies-item type so the explicit
+ * `disc_count: number | null` beats the catch-all index signature
+ * (TS2365: Operator '>' cannot be applied to '{}' and 'number').
+ */
+interface InventoryCopy {
+  entry_id: string | null
+  format: string | null
+  storage_type: string
+  container_name: string | null
+  slot_start: number | null
+  slot_end: number | null
+  location_detail: string | null
+  notes: string | null
+  disc_count: number | null
+  [key: string]: unknown
+}
+
 interface InventoryTitle {
   id: string
   display_title: string
@@ -92,23 +110,13 @@ interface InventoryTitle {
   storage_types: string[]
   season_sets: string[]
   containers: string[]
-  copies: {
-    entry_id: string | null
-    format: string | null
-    storage_type: string
-    container_name: string | null
-    slot_start: number | null
-    slot_end: number | null
-    location_detail: string | null
-    notes: string | null
-    disc_count: number | null
-    [key: string]: unknown
-  }[]
+  copies: InventoryCopy[]
 }
 
 export function Inventory() {
   const [inventoryTitles, setInventoryTitles] = useState<InventoryTitle[]>([])
   const [bundleGeneratedAt, setBundleGeneratedAt] = useState<string>('')
+  const [bundleSchema, setBundleSchema] = useState<string>('1')
 
   useEffect(() => {
     fetch('/titles.json')
@@ -116,6 +124,7 @@ export function Inventory() {
       .then(d => {
         setInventoryTitles(d.titles ?? [])
         setBundleGeneratedAt(d.generated_at ?? '')
+        setBundleSchema(String(d.schema ?? '1'))
       })
       .catch(console.error)
   }, [])
@@ -168,7 +177,7 @@ export function Inventory() {
     const tv = inventoryTitles.filter(t => t.media_type === 'tv').length
     const music = inventoryTitles.filter(t => t.media_type === 'music').length
     return { titles: inventoryTitles.length, copies, movies, tv, music }
-  }, [])
+  }, [inventoryTitles])
 
   // filtering
   const results = useMemo(() => {
@@ -192,7 +201,7 @@ export function Inventory() {
         out = [...out].sort((a, b) => a.display_title.localeCompare(b.display_title))
     }
     return out
-  }, [query, types, formats, sort])
+  }, [inventoryTitles, query, types, formats, sort])
 
   // "/" focuses search, matching the header behavior
   useEffect(() => {
@@ -333,7 +342,7 @@ export function Inventory() {
       )}
 
       <footer className="inventory__foot mono">
-        bundle generated {bundleGeneratedAt.replace('T', ' ').slice(0, 16)} UTC · schema 1
+        bundle generated {bundleGeneratedAt.replace('T', ' ').slice(0, 16)} UTC · schema {bundleSchema}
       </footer>
     </div>
   )

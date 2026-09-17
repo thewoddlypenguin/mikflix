@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && cp src/data/generated/titles.json dist/titles.json",
+    "generate": "node scripts/generate-titles.mjs",
+    "build": "tsc -b && vite build",
     "preview": "vite preview",
     "db:import": "python data/scripts/import_seed.py",
     "db:fresh": "python data/scripts/import_seed.py --fresh",

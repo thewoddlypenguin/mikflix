@@ -44,3 +44,6 @@ tsconfig.tsbuildinfo
 *.njsproj
 *.sln
 *.sw?
+
+# Stray Vite build output at repo root (from an accidental root-dir build)
+/assets/
