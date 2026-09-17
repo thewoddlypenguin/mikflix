@@ -1,22 +1,29 @@
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Play, MapPin, BookmarkPlus, Sparkles, ArrowRight } from 'lucide-react'
-import { mockTitles } from '../data/mock'
+import { fetchTitles } from '../lib/data-adapter'
 import { featuredTitleId, homeCategories, smartLists } from '../data/categories'
 import { summarizeAll } from '../lib/summaries'
 import { Poster, Reveal } from '../components/ui'
 import { CollectionRow, TitleCard } from '../components/collection'
 import { upper, storageAbbr } from '../lib/format'
+import type { MediaTitle } from '../data/types'
 import '../styles/home.css'
 
-const allSummaries = summarizeAll(mockTitles)
-const summariesById = new Map(allSummaries.map(s => [s.id, s]))
-
-function HomeHero() {
+function HomeHero({ titles }: { titles: MediaTitle[] }) {
   const navigate = useNavigate()
-  const featured = mockTitles.find(t => t.id === featuredTitleId)!
-  const box = featured.copies.find(c => c.boxSet)!
-  const binder = featured.copies.find(c => c.copyType === 'binder-disc')!
-  const wl = featured.wishlist!
+
+  /** Featured title: curated pick if it exists, else most copies (ties → alphabetical). */
+  const featured =
+    titles.find(t => t.id === featuredTitleId) ??
+    [...titles].sort(
+      (a, b) => b.copies.length - a.copies.length || a.title.localeCompare(b.title),
+    )[0]
+
+  if (!featured) return null
+
+  const ownedRows = featured.copies.slice(0, 2)
+  const wl = featured.wishlist
 
   return (
     <section className="hero" aria-label="Featured title">
@@ -26,6 +33,8 @@ function HomeHero() {
           hue={featured.artHue}
           motif={featured.artMotif}
           title={featured.title}
+          posterUrl={featured.backdropUrl}
+          wide
           width={900}
           height={506}
         />
@@ -41,45 +50,50 @@ function HomeHero() {
         </Reveal>
         <Reveal delay={160}>
           <p className="hero__meta mono">
-            {featured.year} · {featured.rating} · {upper(featured.runtime)} ·{' '}
-            {featured.genres.join(' / ')}
+            {featured.year || '—'} · {featured.rating} · {upper(featured.runtime)}
+            {featured.genres.length ? ` · ${featured.genres.join(' / ')}` : ''}
           </p>
         </Reveal>
         <Reveal delay={220}>
-          <p className="hero__synopsis">{featured.synopsis}</p>
+          {featured.synopsis && featured.synopsis !== 'No synopsis available.' ? (
+            <p className="hero__synopsis">{featured.synopsis}</p>
+          ) : (
+            <p className="hero__synopsis">
+              {featured.copies.length} {featured.copies.length === 1 ? 'copy' : 'copies'} on the
+              shelf{featured.franchise ? ` — part of ${featured.franchise}` : ''}.
+            </p>
+          )}
         </Reveal>
 
-        <Reveal delay={280}>
-          <div className="hero__ownership">
-            <div className="hero__own-row">
-              <span className="hero__own-icon owned">
-                <MapPin size={13} />
-              </span>
-              <span>
-                <strong>{box.editionName}</strong> — {storageAbbr(box.storageType)}{' '}
-                {box.locationLabel}
-              </span>
+        {ownedRows.length > 0 && (
+          <Reveal delay={280}>
+            <div className="hero__ownership">
+              {ownedRows.map(c => (
+                <div className="hero__own-row" key={c.copyId}>
+                  <span className="hero__own-icon owned">
+                    <MapPin size={13} />
+                  </span>
+                  <span>
+                    <strong>{c.editionName}</strong> — {storageAbbr(c.storageType)}
+                    {c.containerName ? ` ${c.containerName}` : ''}
+                    {c.locationLabel ? ` ${c.locationLabel}` : ''}
+                  </span>
+                </div>
+              ))}
+              {wl && (
+                <div className="hero__own-row">
+                  <span className="hero__own-icon wanted">
+                    <BookmarkPlus size={13} />
+                  </span>
+                  <span>
+                    Want the <strong>{wl.desiredEdition}</strong>
+                    {wl.reason ? ` — ${wl.reason.toLowerCase()}` : ''}
+                  </span>
+                </div>
+              )}
             </div>
-            <div className="hero__own-row">
-              <span className="hero__own-icon neutral">
-                <MapPin size={13} />
-              </span>
-              <span>
-                <strong>{binder.editionName}</strong> — {binder.containerName}{' '}
-                {binder.locationLabel}
-              </span>
-            </div>
-            <div className="hero__own-row">
-              <span className="hero__own-icon wanted">
-                <BookmarkPlus size={13} />
-              </span>
-              <span>
-                Want the <strong>{wl.desiredEdition}</strong>
-                {wl.reason ? ` — ${wl.reason.toLowerCase()}` : ''}
-              </span>
-            </div>
-          </div>
-        </Reveal>
+          </Reveal>
+        )}
 
         <Reveal delay={340}>
           <div className="hero__actions">
@@ -87,9 +101,9 @@ function HomeHero() {
               <Play size={15} />
               Open Title Page
             </button>
-            <button className="btn btn--ghost" onClick={() => navigate('/library?flag=box-set')}>
+            <button className="btn btn--ghost" onClick={() => navigate('/library')}>
               <Sparkles size={15} />
-              Browse Box Sets
+              Browse the Collection
             </button>
           </div>
         </Reveal>
@@ -115,9 +129,24 @@ function SmartListStrip() {
 }
 
 export function Home() {
+  const [titles, setTitles] = useState<MediaTitle[]>([])
+
+  useEffect(() => {
+    let cancelled = false
+    fetchTitles()
+      .then(all => {
+        if (!cancelled) setTitles(all)
+      })
+      .catch(err => console.error('Failed to load titles:', err))
+    return () => { cancelled = true }
+  }, [])
+
+  const allSummaries = summarizeAll(titles)
+  const summariesById = new Map(allSummaries.map(s => [s.id, s]))
+
   return (
     <div className="home">
-      <HomeHero />
+      <HomeHero titles={titles} />
 
       <div className="page">
         <SmartListStrip />

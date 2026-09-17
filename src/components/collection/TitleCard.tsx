@@ -24,6 +24,7 @@ export function TitleCard({ summary, width = 340 }: TitleCardProps) {
           hue={summary.artHue}
           motif={summary.artMotif}
           title={summary.title}
+          posterUrl={summary.posterUrl}
           width={width}
           height={Math.round(width * 1.5)}
         />

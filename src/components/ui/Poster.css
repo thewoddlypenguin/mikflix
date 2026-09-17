@@ -1,4 +1,16 @@
+/* Procedural canvas poster art (fallback when no TMDb image exists) */
 .poster-canvas {
   display: block;
   border-radius: var(--r-md);
+}
+
+/* TMDb poster image (real art when available). Falls back to the canvas
+   via Poster.tsx's onError handler if the remote image fails. */
+.poster-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: var(--r-md);
+  background: var(--bg-2, #221a15);
 }

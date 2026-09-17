@@ -1,0 +1,32 @@
+[
+  {
+    "content": "[tmdb-1] data-adapter: posterUrl/backdropUrl construction + art fields + fetchTitles helper",
+    "id": "tmdb-1",
+    "status": "in_progress"
+  },
+  {
+    "content": "[tmdb-2] Poster.tsx: posterUrl prop, <img> with onError fallback to canvas; .poster-img CSS",
+    "id": "tmdb-2",
+    "status": "pending"
+  },
+  {
+    "content": "[tmdb-3] TitleDetail.tsx: real data, backdrop image, posterUrl, related from franchise",
+    "id": "tmdb-3",
+    "status": "pending"
+  },
+  {
+    "content": "[tmdb-4] Home.tsx: real data hero (data-safe featured), backdrop image, rows from real summaries",
+    "id": "tmdb-4",
+    "status": "pending"
+  },
+  {
+    "content": "[tmdb-5] Wishlist.tsx + Admin.tsx: migrate to real adapter data",
+    "id": "tmdb-5",
+    "status": "pending"
+  },
+  {
+    "content": "[tmdb-6] Build, verify dev modules, grep zero mockTitles refs, commit",
+    "id": "tmdb-6",
+    "status": "pending"
+  }
+]

@@ -54,6 +54,7 @@ export function WishlistCard({ summary, entry }: WishlistCardProps) {
           hue={summary.artHue}
           motif={summary.artMotif}
           title={summary.title}
+          posterUrl={summary.posterUrl}
           width={190}
           height={285}
         />

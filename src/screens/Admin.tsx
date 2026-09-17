@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
 import { Lock, FileUp, Film, PackagePlus, Pencil, TriangleAlert } from 'lucide-react'
-import { mockTitles } from '../data/mock'
+import { fetchTitles } from '../lib/data-adapter'
 import { summarizeAll } from '../lib/summaries'
 import { Badge } from '../components/ui'
 import './admin.css'
@@ -38,7 +39,23 @@ const PLACEHOLDERS = [
 ]
 
 export function Admin() {
-  const uncertain = summarizeAll(mockTitles).filter(s => s.hasUncertainMatch)
+  const [uncertain, setUncertain] = useState(() => [] as ReturnType<typeof summarizeAll>)
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchTitles()
+      .then(all => {
+        if (cancelled) return
+        setUncertain(summarizeAll(all).filter(s => s.hasUncertainMatch))
+        setLoaded(true)
+      })
+      .catch(err => {
+        console.error('Failed to load titles:', err)
+        if (!cancelled) setLoaded(true)
+      })
+    return () => { cancelled = true }
+  }, [])
 
   return (
     <div className="page admin">
@@ -79,7 +96,7 @@ export function Admin() {
               <span className="mono">low confidence</span>
             </div>
           ))}
-          {uncertain.length === 0 && (
+          {uncertain.length === 0 && loaded && (
             <p className="admin__queue-empty">Queue is clear — every label matched cleanly.</p>
           )}
         </div>

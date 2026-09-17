@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { hashSeed } from '../../lib/format'
 import './Poster.css'
 
@@ -7,6 +7,10 @@ interface PosterProps {
   hue: number
   motif?: 'ring' | 'arch' | 'horizon' | 'emblem' | 'mono'
   title: string
+  /** TMDb poster URL — when provided, renders the real image instead of procedural art */
+  posterUrl?: string
+  /** Set for wide-format usage (hero backdrops); ignored by the canvas path */
+  wide?: boolean
   width?: number
   height?: number
 }
@@ -58,12 +62,15 @@ function wrapText(
   return lines
 }
 
-export function Poster({ seed, hue, motif = 'ring', title, width = 340, height = 510 }: PosterProps) {
+export function Poster({ seed, hue, motif = 'ring', title, posterUrl, wide = false, width = 340, height = 510 }: PosterProps) {
   const ref = useRef<HTMLCanvasElement>(null)
+  const [imgFailed, setImgFailed] = useState(false)
+  const showImage = Boolean(posterUrl) && !imgFailed
 
   useEffect(() => {
     const canvas = ref.current
     if (!canvas) return
+    if (showImage) return // real image is shown; skip canvas work
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
     canvas.width = width * dpr
     canvas.height = height * dpr
@@ -279,7 +286,21 @@ export function Poster({ seed, hue, motif = 'ring', title, width = 340, height =
     // baseline rule
     ctx.fillStyle = p.accent()
     ctx.fillRect(width * 0.5 - 22, blockY + 12 + lines.length * 28, 44, 2)
-  }, [seed, hue, motif, title, width, height])
+  }, [seed, hue, motif, title, width, height, showImage])
+
+  if (showImage) {
+    return (
+      <img
+        src={posterUrl}
+        alt={`Poster art for ${title}`}
+        className="poster-img"
+        onError={() => setImgFailed(true)}
+        style={wide ? { aspectRatio: '16 / 9', width: '100%', objectFit: 'cover' } : undefined}
+        loading="lazy"
+        decoding="async"
+      />
+    )
+  }
 
   return (
     <canvas

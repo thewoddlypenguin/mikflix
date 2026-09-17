@@ -35,6 +35,10 @@ interface RawTitle {
   media_type: string
   franchise: string | null
   release_year: number | null
+  tmdb_id?: number | string | null
+  tmdb_media_type?: string | null
+  poster_path?: string | null
+  backdrop_path?: string | null
   match_status: string
   match_confidence: string
   copy_count: number
@@ -42,6 +46,9 @@ interface RawTitle {
   storage_types: string[]
   season_sets: string[]
   containers: string[]
+  art_seed?: string
+  art_hue?: number
+  art_motif?: string
   copies: RawCopy[]
 }
 
@@ -108,6 +115,20 @@ function normalizeTitle(title: string): string {
     .trim()
 }
 
+// ─── TMDb image URLs ───────────────────────────────────────────────────────
+
+const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p'
+const POSTER_WIDTH = 'w500'
+const BACKDROP_WIDTH = 'w1280'
+
+function mapImageUrl(
+  path: string | null | undefined,
+  size: string,
+): string | undefined {
+  if (!path) return undefined
+  return `${TMDB_IMAGE_BASE}/${size}${path}`
+}
+
 // ─── Copy mapper ───────────────────────────────────────────────────────────
 
 function mapCopy(raw: RawCopy, titleId: string, index: number): MediaCopy {
@@ -133,6 +154,14 @@ function mapCopy(raw: RawCopy, titleId: string, index: number): MediaCopy {
 
 // ─── Title mapper ──────────────────────────────────────────────────────────
 
+const ART_MOTIFS: MediaTitle['artMotif'][] = ['ring', 'arch', 'horizon', 'emblem', 'mono']
+
+function mapArtMotif(raw: string | null | undefined): MediaTitle['artMotif'] {
+  return ART_MOTIFS.includes(raw as MediaTitle['artMotif'])
+    ? (raw as MediaTitle['artMotif'])
+    : 'ring'
+}
+
 function mapTitle(raw: RawTitle): MediaTitle {
   return {
     id: raw.id,
@@ -145,8 +174,11 @@ function mapTitle(raw: RawTitle): MediaTitle {
     rating: 'NR',
     runtime: 'Unknown',
     synopsis: 'No synopsis available.',
-    artSeed: raw.id,
-    artHue: 0,
+    posterUrl: mapImageUrl(raw.poster_path, POSTER_WIDTH),
+    backdropUrl: mapImageUrl(raw.backdrop_path, BACKDROP_WIDTH),
+    artSeed: raw.art_seed ?? raw.id,
+    artHue: raw.art_hue ?? 0,
+    artMotif: mapArtMotif(raw.art_motif),
     copies: raw.copies.map((c, i) => mapCopy(c, raw.id, i)),
   }
 }
@@ -165,4 +197,15 @@ function mapTitle(raw: RawTitle): MediaTitle {
 export function loadTitles(bundle: unknown): MediaTitle[] {
   const { titles } = bundle as RawBundle
   return titles.map(mapTitle)
+}
+
+/**
+ * Fetch /titles.json and adapt it in one step — the shared entry point for
+ * every screen that needs the collection at runtime.
+ */
+export async function fetchTitles(): Promise<MediaTitle[]> {
+  const res = await fetch('/titles.json')
+  if (!res.ok) throw new Error(`titles.json ${res.status}`)
+  const bundle = await res.json()
+  return loadTitles(bundle)
 }

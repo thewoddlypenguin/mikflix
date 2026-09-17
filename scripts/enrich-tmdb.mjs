@@ -1,6 +1,4 @@
 import 'dotenv/config'
-console.log('API KEY:', process.env.TMDB_API_KEY)
-console.log('READ TOKEN:', process.env.TMDB_READ_TOKEN)
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -38,9 +36,31 @@ const env = loadEnv()
 const BEARER_TOKEN = env.TMDB_READ_TOKEN || process.env.TMDB_READ_TOKEN || ''
 const API_KEY      = env.TMDB_API_KEY    || process.env.TMDB_API_KEY    || ''
 
-if (!BEARER_TOKEN && !API_KEY) {
-  console.error('❌  No TMDb credentials found. Set TMDB_READ_TOKEN or TMDB_API_KEY in .env')
+// Warm the cache before the credential check so a cold clone (no .env) can
+// still rebuild fully from the committed cache without network access.
+const warmCache = loadCache()
+const warmCacheable = (titlesJsonPath) => {
+  if (!existsSync(titlesJsonPath)) return 0
+  try {
+    const bundle = JSON.parse(readFileSync(titlesJsonPath, 'utf8'))
+    return bundle.titles.filter(t => {
+      if (t.media_type === 'music') return true // always skipped
+      const key = t.tmdb_id
+        ? `details:${t.tmdb_media_type}:${t.tmdb_id}`
+        : `search:${t.id}`
+      return Boolean(warmCache[key]?.enrichment)
+    }).length
+  } catch { return 0 }
+}
+
+if (!BEARER_TOKEN && !API_KEY && warmCacheable(TITLES_PATH) === 0) {
+  console.error('❌  No TMDb credentials found and cache cannot cover the bundle.')
+  console.error('    Set TMDB_READ_TOKEN or TMDB_API_KEY in .env, then re-run.')
   process.exit(1)
+}
+if (!BEARER_TOKEN && !API_KEY) {
+  console.warn('⚠️  No TMDb credentials — running from cache only; titles missing')
+  console.warn('    cache entries will be left un-enriched (no network calls).')
 }
 
 function authHeaders() {
@@ -230,6 +250,11 @@ async function main() {
       let tmdbMediaType = title.tmdb_media_type || title.media_type
 
       if (!tmdbId) {
+        if (!BEARER_TOKEN && !API_KEY) {
+          // Offline: no credentials and no cached search result for this title
+          process.stdout.write(`  ↩  ${label} (offline — no cached match, left un-enriched)\n`)
+          continue
+        }
         process.stdout.write(`  🔍 ${label}...\n`)
         await sleep(RATE_LIMIT_MS)
 
@@ -247,6 +272,10 @@ async function main() {
         tmdbMediaType = best.title ? 'movie' : 'tv'
         process.stdout.write(`     → "${best.title || best.name}" (${best.release_date || best.first_air_date || 'n/a'}) id:${tmdbId}\n`)
       } else {
+        if (!warmCache[cacheKey]?.enrichment && !BEARER_TOKEN && !API_KEY) {
+          process.stdout.write(`  ↩  ${label} (offline — details not cached, left as-is)\n`)
+          continue
+        }
         process.stdout.write(`  📋 ${label} (id:${tmdbId})...\n`)
       }
 

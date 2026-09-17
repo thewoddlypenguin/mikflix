@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 import {
   Play,
@@ -8,31 +9,58 @@ import {
   ArrowUpNarrowWide,
   TriangleAlert,
 } from 'lucide-react'
-import { mockTitles } from '../data/mock'
+import { fetchTitles } from '../lib/data-adapter'
 import { summarizeTitle } from '../lib/summaries'
 import { addedLabel, ownedCopies } from '../lib/collection'
 import { Badge, Poster, wishlistBadge } from '../components/ui'
 import { CopyCard } from '../components/collection'
 import { upper, storageAbbr, storageGlyph } from '../lib/format'
+import type { MediaTitle } from '../data/types'
 import './titleDetail.css'
 
 export function TitleDetail() {
   const { titleId } = useParams()
   const navigate = useNavigate()
-  const title = mockTitles.find(t => t.id === titleId)
+  const [titles, setTitles] = useState<MediaTitle[]>([])
+  const [notFound, setNotFound] = useState(false)
 
-  if (!title) {
+  useEffect(() => {
+    let cancelled = false
+    fetchTitles()
+      .then(all => {
+        if (cancelled) return
+        setTitles(all)
+        setNotFound(!all.some(t => t.id === titleId))
+      })
+      .catch(err => {
+        console.error('Failed to load titles:', err)
+        if (!cancelled) setNotFound(true)
+      })
+    return () => { cancelled = true }
+  }, [titleId])
+
+  if (notFound) {
     return (
       <div className="page td__missing">
         <p className="kicker">Off the shelf</p>
         <h1>That title isn’t logged yet</h1>
         <p className="td__missing-body">
-          The record you’re looking for isn’t in the current (mock) dataset.
+          The record you’re looking for isn’t in the current dataset.
         </p>
         <button className="btn btn--ghost" onClick={() => navigate('/library')}>
           <ArrowLeft size={15} />
           Back to Library
         </button>
+      </div>
+    )
+  }
+
+  const title = titles.find(t => t.id === titleId)
+  if (!title) {
+    return (
+      <div className="page td__missing">
+        <p className="kicker">Off the shelf</p>
+        <h1>Loading…</h1>
       </div>
     )
   }
@@ -53,6 +81,8 @@ export function TitleDetail() {
             hue={title.artHue}
             motif={title.artMotif}
             title={title.title}
+            posterUrl={title.backdropUrl}
+            wide
             width={900}
             height={506}
           />
@@ -72,6 +102,7 @@ export function TitleDetail() {
                 hue={title.artHue}
                 motif={title.artMotif}
                 title={title.title}
+                posterUrl={title.posterUrl}
                 width={380}
                 height={570}
               />
@@ -222,18 +253,19 @@ export function TitleDetail() {
             </Link>
           </header>
           <div className="td-nearby">
-            {mockTitles
+            {titles
               .filter(
                 t =>
                   t.id !== title.id &&
-                  (t.franchise === title.franchise || t.genres.some(g => title.genres.includes(g))),
+                  title.franchise != null &&
+                  t.franchise === title.franchise,
               )
               .slice(0, 4)
               .map(t => {
                 const s = summarizeTitle(t)
                 return (
                   <Link key={t.id} to={`/title/${t.id}`} className="td-nearby__card">
-                    <Poster seed={s.artSeed} hue={s.artHue} motif={s.artMotif} title={s.title} width={180} height={270} />
+                    <Poster seed={s.artSeed} hue={s.artHue} motif={s.artMotif} title={s.title} posterUrl={s.posterUrl} width={180} height={270} />
                     <span className="td-nearby__name">{s.title}</span>
                     <span className="mono">{s.year}</span>
                   </Link>

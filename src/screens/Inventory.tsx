@@ -39,6 +39,9 @@ const SORT_OPTS: { value: SortKey; label: string }[] = [
 
 const MOTIFS = ['ring', 'arch', 'horizon', 'emblem', 'mono'] as const
 
+/** TMDb CDN base for poster images (w500) */
+const TMDB_POSTER_BASE = 'https://image.tmdb.org/t/p/w500'
+
 /** Deterministic poster art inputs from a title id (mirrors mock.ts approach) */
 function artFor(id: string): { hue: number; motif: (typeof MOTIFS)[number] } {
   const h = hashSeed(id)
@@ -105,6 +108,7 @@ interface InventoryTitle {
   release_year: number | null
   match_status: string
   match_confidence: string | null
+  poster_path?: string | null
   copy_count: number
   formats: string[]
   storage_types: string[]
@@ -325,6 +329,7 @@ export function Inventory() {
                       hue={art.hue}
                       motif={art.motif}
                       title={t.display_title}
+                      posterUrl={t.poster_path ? TMDB_POSTER_BASE + t.poster_path : undefined}
                       width={260}
                       height={390}
                     />

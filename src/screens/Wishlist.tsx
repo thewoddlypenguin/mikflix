@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { BookmarkPlus, SearchX } from 'lucide-react'
-import { mockTitles } from '../data/mock'
+import { fetchTitles } from '../lib/data-adapter'
 import { summarizeAll } from '../lib/summaries'
 import { Reveal, EmptyState } from '../components/ui'
 import { WishlistCard } from '../components/collection'
-import type { WishlistType } from '../data/types'
+import type { MediaTitle, WishlistType } from '../data/types'
 import './wishlist.css'
 
 const GROUP_ORDER: { type: WishlistType | 'all'; label: string; blurb: string }[] = [
@@ -19,15 +19,26 @@ const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 } as const
 
 export function Wishlist() {
   const [group, setGroup] = useState<WishlistType | 'all'>('all')
+  const [titles, setTitles] = useState<MediaTitle[]>([])
+
+  useEffect(() => {
+    let cancelled = false
+    fetchTitles()
+      .then(all => {
+        if (!cancelled) setTitles(all)
+      })
+      .catch(err => console.error('Failed to load titles:', err))
+    return () => { cancelled = true }
+  }, [])
 
   const entries = useMemo(() => {
-    return summarizeAll(mockTitles)
+    return summarizeAll(titles)
       .filter(s => s.hasWishlist)
       .map(summary => ({
         summary,
-        entry: mockTitles.find(t => t.id === summary.id)!.wishlist!,
+        entry: titles.find(t => t.id === summary.id)!.wishlist!,
       }))
-  }, [])
+  }, [titles])
 
   const visible = useMemo(() => {
     const list = group === 'all' ? entries : entries.filter(e => e.entry.wishlistType === group)
