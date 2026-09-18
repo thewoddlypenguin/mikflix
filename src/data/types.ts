@@ -40,6 +40,8 @@ export interface MediaCopy {
   locationLabel?: string
   copyType: CopyType
   rawLabel?: string
+  /** physical condition of this copy, e.g. "Mint", "Good", "Worn" */
+  condition?: string
   titleMatchStatus?: MatchStatus
   matchConfidence?: number
   notes?: string
@@ -75,6 +77,7 @@ export interface MediaTitle {
   posterUrl?: string
   backdropUrl?: string
   trailerUrl?: string
+  tagline?: string
   copies: MediaCopy[]
   wishlist?: WishlistEntry
   /** visual identity for procedural poster art */

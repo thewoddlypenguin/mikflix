@@ -36,6 +36,22 @@ const env = loadEnv()
 const BEARER_TOKEN = env.TMDB_READ_TOKEN || process.env.TMDB_READ_TOKEN || ''
 const API_KEY      = env.TMDB_API_KEY    || process.env.TMDB_API_KEY    || ''
 
+const ADMIN_OWNED_FIELDS = new Set([
+  'display_title', 'media_type', 'franchise', 'release_year',
+  'manual_image_url', 'genres', 'overview', 'tagline', 'vote_average', 'runtime',
+  'wishlist',
+])
+
+/** Ids with admin patches — enrichment must not clobber their owned fields. */
+function loadAdminPatchedIds() {
+  const overridesPath = join(ROOT, 'data', 'admin', 'overrides.json')
+  if (!existsSync(overridesPath)) return new Set()
+  try {
+    const ov = JSON.parse(readFileSync(overridesPath, 'utf8'))
+    return new Set(Object.keys(ov.patches ?? {}))
+  } catch { return new Set() }
+}
+
 // Warm the cache before the credential check so a cold clone (no .env) can
 // still rebuild fully from the committed cache without network access.
 const warmCache = loadCache()
@@ -214,6 +230,11 @@ async function main() {
   const titles = bundle.titles
   console.log(`📚 Loaded ${titles.length} titles`)
 
+  // Titles with admin patches keep their admin-owned fields (genres, overview,
+  // …) — enrichment may still fill TMDb bookkeeping (tmdb_id, poster_path).
+  const adminPatched = loadAdminPatchedIds()
+  if (adminPatched.size) console.log(`🛡  ${adminPatched.size} admin-patched titles (fields protected)`)
+
   const cache = loadCache()
   console.log(`💾 Cache: ${Object.keys(cache).length} entries`)
 
@@ -222,6 +243,15 @@ async function main() {
   for (let i = 0; i < titles.length; i++) {
     const title = titles[i]
     const label = `[${i + 1}/${titles.length}] ${title.display_title}`
+    const isAdminPatched = adminPatched.has(title.id)
+
+    // Apply enrichment object without clobbering admin-owned fields
+    const assignEnrichment = (enrichment) => {
+      if (!isAdminPatched) { Object.assign(title, enrichment); return }
+      for (const [field, value] of Object.entries(enrichment)) {
+        if (!ADMIN_OWNED_FIELDS.has(field) || title[field] === undefined) title[field] = value
+      }
+    }
 
     const cacheKey = title.tmdb_id
       ? `details:${title.tmdb_media_type}:${title.tmdb_id}`
@@ -229,7 +259,8 @@ async function main() {
 
     // Serve from cache if available
     if (cache[cacheKey]?.enrichment) {
-      Object.assign(title, cache[cacheKey].enrichment, {
+      assignEnrichment(cache[cacheKey].enrichment)
+      Object.assign(title, {
         tmdb_id:         cache[cacheKey].tmdb_id ?? title.tmdb_id,
         tmdb_media_type: cache[cacheKey].tmdb_media_type ?? title.tmdb_media_type,
       })
@@ -285,7 +316,7 @@ async function main() {
 
       title.tmdb_id         = tmdbId
       title.tmdb_media_type = tmdbMediaType
-      Object.assign(title, enrichment)
+      assignEnrichment(enrichment)
 
       const detailKey       = `details:${tmdbMediaType}:${tmdbId}`
       cache[detailKey]      = { tmdb_id: tmdbId, tmdb_media_type: tmdbMediaType, enrichment, cached_at: new Date().toISOString() }

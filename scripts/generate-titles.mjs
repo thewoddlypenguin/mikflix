@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync } from 'fs'
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -185,11 +185,69 @@ for (const [, entry] of titleMap) {
   })
 }
 
+// ─── Admin overrides (data/admin/overrides.json) ──────────────────────────
+// Admin edits (API: scripts/admin-api.mjs) are recorded in a sidecar so they
+// survive this CSV rebuild: patches are re-applied, admin-added titles are
+// re-appended, deleted titles stay deleted.
+
+const OVERRIDES_PATH = join(ROOT, 'data', 'admin', 'overrides.json')
+
+function loadOverrides() {
+  if (!existsSync(OVERRIDES_PATH)) return null
+  try { return JSON.parse(readFileSync(OVERRIDES_PATH, 'utf8')) } catch { return null }
+}
+
+/** Destructive fields whose explicit `null` in a patch means "remove". */
+const CLEARABLE_FIELDS = new Set(['franchise', 'wishlist', 'manual_image_url'])
+
+function recomputeDenorm(title) {
+  const copies = title.copies ?? []
+  title.copy_count = copies.length
+  title.formats = [...new Set(copies.map(c => c.format).filter(Boolean))]
+  title.storage_types = [...new Set(copies.map(c => c.storage_type).filter(Boolean))]
+  title.season_sets = [...new Set(copies.map(c => c.season_set).filter(Boolean))]
+  title.containers = [...new Set(copies.map(c => c.container_name).filter(Boolean))]
+  return title
+}
+
+function applyOverrides(titles) {
+  const ov = loadOverrides()
+  if (!ov) return titles
+  const patches = ov.patches ?? {}
+  const deletedIds = new Set(ov.deletedIds ?? [])
+  const added = ov.added ?? []
+  let patched = 0
+
+  // 1+2. drop tombstoned titles, re-apply patches to survivors
+  for (let i = titles.length - 1; i >= 0; i--) {
+    const t = titles[i]
+    if (deletedIds.has(t.id)) { titles.splice(i, 1); continue }
+    const patch = patches[t.id]
+    if (!patch) continue
+    for (const [field, value] of Object.entries(patch)) {
+      if (value === null && CLEARABLE_FIELDS.has(field)) delete t[field]
+      else t[field] = value
+    }
+    recomputeDenorm(t)
+    patched++
+  }
+
+  // 3. re-append admin-created titles (recompute denorm for safety)
+  for (const t of added) titles.push(recomputeDenorm(t))
+
+  if (patched || deletedIds.size || added.length) {
+    console.log(`   ↻ Admin overrides: ${patched} patched, ${deletedIds.size} deleted, ${added.length} added`)
+  }
+  return titles
+}
+
 titles.sort((a, b) => {
   const order = { tv: 0, music: 1, movie: 2 }
   if (a.media_type !== b.media_type) return (order[a.media_type] ?? 9) - (order[b.media_type] ?? 9)
   return a.display_title.localeCompare(b.display_title)
 })
+
+applyOverrides(titles)
 
 mkdirSync(outDir, { recursive: true })
 const bundle = { schema: '1.1.0', generated_at: new Date().toISOString(), titles }

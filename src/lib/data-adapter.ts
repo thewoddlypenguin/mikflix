@@ -24,9 +24,18 @@ interface RawCopy {
   location_detail: string | null
   format: string
   label_raw: string | null
+  condition?: string | null
   match_status: string
   match_confidence: string
   notes: string | null
+}
+
+interface RawWishlist {
+  wishlist_type: string
+  desired_edition: string | null
+  desired_format: string | null
+  priority: string
+  reason: string | null
 }
 
 interface RawTitle {
@@ -50,6 +59,14 @@ interface RawTitle {
   art_seed?: string
   art_hue?: number
   art_motif?: string
+  /** TMDb enrichment (present when cached/enriched) */
+  overview?: string | null
+  genres?: string[] | null
+  vote_average?: number | null
+  runtime?: number | null
+  tagline?: string | null
+  /** admin-managed wishlist entry */
+  wishlist?: RawWishlist | null
   copies: RawCopy[]
 }
 
@@ -147,10 +164,47 @@ function mapCopy(raw: RawCopy, titleId: string, index: number): MediaCopy {
         : undefined,
     copyType: mapCopyType(raw),
     rawLabel: raw.label_raw ?? undefined,
+    condition: raw.condition ?? undefined,
     titleMatchStatus: mapMatchStatus(raw.match_status),
     matchConfidence: mapMatchConfidence(raw.match_confidence),
     notes: raw.notes ?? undefined,
   }
+}
+
+// ─── Wishlist mapper ───────────────────────────────────────────────────────
+
+function mapWishlistType(raw: string): 'buy' | 'replace' | 'upgrade' | 'missing-box' {
+  if (raw === 'buy' || raw === 'replace' || raw === 'upgrade' || raw === 'missing-box') return raw
+  return 'buy'
+}
+
+function mapPriority(raw: string): 'high' | 'medium' | 'low' {
+  if (raw === 'high' || raw === 'medium' || raw === 'low') return raw
+  return 'medium'
+}
+
+function mapWishlist(raw: RawWishlist | null | undefined, fallbackFormat: Format): MediaTitle['wishlist'] {
+  if (!raw) return undefined
+  return {
+    wishlistId: `wl-${raw.wishlist_type}`,
+    wishlistType: mapWishlistType(raw.wishlist_type),
+    desiredEdition: raw.desired_edition ?? 'Any edition',
+    desiredFormat: (raw.desired_format as Format) ?? fallbackFormat,
+    priority: mapPriority(raw.priority),
+    reason: raw.reason ?? undefined,
+  }
+}
+
+function mapRating(vote: number | null | undefined): string {
+  if (vote == null || vote <= 0) return 'NR'
+  return vote.toFixed(1)
+}
+
+function mapRuntime(runtime: number | null | undefined): string {
+  if (runtime == null || runtime <= 0) return 'Unknown'
+  return runtime >= 60
+    ? `${Math.floor(runtime / 60)}h ${runtime % 60}m`
+    : `${runtime}m`
 }
 
 // ─── Title mapper ──────────────────────────────────────────────────────────
@@ -164,17 +218,19 @@ function mapArtMotif(raw: string | null | undefined): MediaTitle['artMotif'] {
 }
 
 function mapTitle(raw: RawTitle): MediaTitle {
+  const firstCopyFormat = mapFormat(raw.copies[0]?.format ?? null, raw.copies[0]?.location_detail ?? null)
   return {
     id: raw.id,
     title: raw.display_title,
     normalizedTitle: normalizeTitle(raw.display_title),
     mediaType: mapMediaType(raw.media_type),
     franchise: raw.franchise ?? undefined,
-    genres: [],
+    genres: raw.genres ?? [],
     year: raw.release_year ?? 0,
-    rating: 'NR',
-    runtime: 'Unknown',
-    synopsis: 'No synopsis available.',
+    rating: mapRating(raw.vote_average),
+    runtime: mapRuntime(raw.runtime),
+    synopsis: raw.overview || 'No synopsis available.',
+    tagline: raw.tagline ?? undefined,
     posterUrl:
       raw.manual_image_url ?? mapImageUrl(raw.poster_path, POSTER_WIDTH),
     backdropUrl: mapImageUrl(raw.backdrop_path, BACKDROP_WIDTH),
@@ -182,6 +238,7 @@ function mapTitle(raw: RawTitle): MediaTitle {
     artSeed: raw.art_seed ?? raw.id,
     artHue: raw.art_hue ?? 0,
     artMotif: mapArtMotif(raw.art_motif),
+    wishlist: mapWishlist(raw.wishlist, firstCopyFormat),
     copies: raw.copies.map((c, i) => mapCopy(c, raw.id, i)),
   }
 }

@@ -12,11 +12,11 @@
   {
     "content": "[img-3] Admin.tsx: image manager UI (search, URL input, upload, preview, remove)",
     "id": "img-3",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "[img-4] start scripts + npm script; verify round-trip; commit",
     "id": "img-4",
-    "status": "pending"
+    "status": "completed"
   }
 ]
