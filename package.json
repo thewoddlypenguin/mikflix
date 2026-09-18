@@ -8,6 +8,7 @@
     "generate": "node scripts/generate-titles.mjs",
     "enrich": "node scripts/enrich-tmdb.mjs",
     "build": "npm run generate && npm run enrich && tsc -b && vite build",
+    "admin:api": "node scripts/admin-images.mjs",
     "preview": "vite preview",
     "db:import": "python data/scripts/import_seed.py",
     "db:fresh": "python data/scripts/import_seed.py --fresh",

@@ -39,6 +39,7 @@ interface RawTitle {
   tmdb_media_type?: string | null
   poster_path?: string | null
   backdrop_path?: string | null
+  manual_image_url?: string | null
   match_status: string
   match_confidence: string
   copy_count: number
@@ -174,8 +175,10 @@ function mapTitle(raw: RawTitle): MediaTitle {
     rating: 'NR',
     runtime: 'Unknown',
     synopsis: 'No synopsis available.',
-    posterUrl: mapImageUrl(raw.poster_path, POSTER_WIDTH),
+    posterUrl:
+      raw.manual_image_url ?? mapImageUrl(raw.poster_path, POSTER_WIDTH),
     backdropUrl: mapImageUrl(raw.backdrop_path, BACKDROP_WIDTH),
+    manualImageUrl: raw.manual_image_url ?? undefined,
     artSeed: raw.art_seed ?? raw.id,
     artHue: raw.art_hue ?? 0,
     artMotif: mapArtMotif(raw.art_motif),

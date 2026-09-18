@@ -1,0 +1,22 @@
+[
+  {
+    "content": "[img-1] types + adapter: manual_image_url field, priority over TMDb poster, summaries passthrough",
+    "id": "img-1",
+    "status": "completed"
+  },
+  {
+    "content": "[img-2] server: admin-images.mjs (GET/POST /api/manual-image, writes both titles.json)",
+    "id": "img-2",
+    "status": "completed"
+  },
+  {
+    "content": "[img-3] Admin.tsx: image manager UI (search, URL input, upload, preview, remove)",
+    "id": "img-3",
+    "status": "in_progress"
+  },
+  {
+    "content": "[img-4] start scripts + npm script; verify round-trip; commit",
+    "id": "img-4",
+    "status": "pending"
+  }
+]

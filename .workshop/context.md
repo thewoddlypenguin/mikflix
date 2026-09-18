@@ -1,45 +1,30 @@
 # Project: Mikflix (My Movie Database)
 
-Personal physical-media collection browser ("Mikflix"). Phase: front-end app shell (mock data) + local data pipeline (CSV seeds → SQLite).
+Personal physical-media collection browser ("Mikflix"). Phase: full real-data app (632 titles) with TMDb imagery + local data pipeline.
 
 ## Stack & Conventions
-- Vite + React 19 + TypeScript + react-router v7 (library package: `react-router`, imports from `react-router`)
-- Deps: motion, lucide-react. Node 22 / npm 10, Windows shell (no `tail`; use `findstr`)
-- Run: `start.bat` / `start.sh` (uses $APP_PORT) · Build: `npm run build` (tsc -b + vite)
-- tsconfig is strict with noUnusedLocals/Parameters — unused imports fail the build
-- Data scripts: Python 3.11+ stdlib only (csv, sqlite3, hashlib) — run via `python data/scripts/import_seed.py` or `npm run db:import` / `npm run db:fresh`
+- Vite 6 + React 19 + TypeScript strict (noUnusedLocals/Parameters) + react-router v7 (`react-router`)
+- Deps: motion, lucide-react, dotenv (for enrich script). Node 22 / npm 10, Windows shell (no `tail`; use `findstr`)
+- Run: `start.bat` / `start.sh` (uses $APP_PORT, dev server ~3035) · Build: `npm run build` = `generate && enrich && tsc -b && vite build` · Data: `npm run generate` (CSV→titles.json), `npm run enrich` (TMDb), `db:import`/`db:fresh`/`db:export` (SQLite pipeline, superseded by CSV+enrich flow for frontend)
+- vite `base: '/'` (absolute) — required for SPA deep-link refresh under nginx `try_files $uri $uri/ /index.html`; favicon `/mikflix.svg`
 
-## Data Pipeline (Batch 1)
-- `data/seeds/inventory-batch-1.csv` — version-controlled seed (572 rows, NOT 52; 517 titles, 572 copies)
-- `data/migrations/0001_init.sql` — SQLite schema: titles / copies / import_runs
-- `data/scripts/import_seed.py` — idempotent importer keyed by (source_seed, source_row); preserves enrichment across re-imports
-- `data/local/` (gitignored) — generated mikflix.db; `src/data/generated/` (gitignored) — future exported JSON bundle
-- CSV row families normalized on the fly: comma-split titles (6), manual dup-title rows (209), missing disc_count (10), format/location swap (6); all repairs logged in import_runs table
-- Data quality: 316 unmatched titles, 12 uncertain + 1 review, 0 TMDb enrichment fields populated, 2 slot double-bookings (Container B slot 48, Container E slot 21), 18 catalog+manual merged duplicates (legit second copies)
+## Data Flow (current)
+- Source: `src/data/digital-inventory-batch-1.csv` (644 rows) → `scripts/generate-titles.mjs` → `src/data/generated/titles.json` + mirrored `public/titles.json` (schema 1.2.0, 632 titles / 644 copies)
+- `scripts/enrich-tmdb.mjs`: TMDb search+details, cache at `scripts/tmdb-cache.json` (committed, 1134 entries, covers 585 titles; 42 un-enriched; 5 music skipped). Works OFFLINE from cache when no .env; only hits API for uncached titles. NEVER log credential values.
+- Frontend loads at runtime: `fetchTitles()` in `src/lib/data-adapter.ts` (fetch /titles.json → MediaTitle[]). ALL screens use it (Home, Library, TitleDetail, Wishlist, Admin, Inventory). mock.ts remains but has zero importers.
+- Adapter maps: poster_path→posterUrl (w500), backdrop_path→backdropUrl (w1280), art_seed/art_hue/art_motif→procedural fallback art, movie→film, storage discgear→shelf. Enrichment fields (overview, genres, vote_average) exist in bundle but are NOT yet mapped — adapter still emits genres:[], rating:'NR', synopsis:'No synopsis available.'
+- Enrichment writes title-level match_status='unmatched' for ALL titles (upstream data quirk) — copy-level too. Admin review queue + uncertain badges therefore show nothing.
 
-## Architecture
-- `src/data/` — types.ts (flat MediaTitle/MediaCopy/WishlistEntry; future schema splits title/edition/copy/wishlist), mock.ts (20 titles), categories.ts (home rows + smart list hrefs)
-- `src/lib/` — summaries.ts (denormalized TitleSummary cards), collection.ts (filters/sort/flags), format.ts
-- `src/components/{ui,collection,library,layout}/` with per-component CSS + barrel index.ts
-- `src/screens/` — Home, Library, TitleDetail, Wishlist, Admin, NotFound; screen CSS beside each
-- Library filters fully URL-synced (`?q=&type=&genre=&format=&storage=&container=&flag=&view=&sort=`); presets via `?preset=`
-
-## Design System ("warm midnight projection booth")
-- Tokens in `src/styles/theme.css`: espresso bg, gold=owned, teal=wanted/wishlist, ember=lost, lilac=uncertain-match
-- Fonts: Fraunces (display), Karla (UI), IBM Plex Mono (locations/labels) via Google Fonts in index.html
-- Posters are PROCEDURAL: `<Poster seed hue motif>` canvas art (motifs: ring/arch/horizon/emblem/mono) — no image assets. Canvas colors MUST use `hsla(h,s%,l%,a)` helpers (appended hex alpha to hsl() throws SyntaxError)
-- Badge tones carry product meaning; reuse titleBadges()/wishlistBadge() from ui/Badge
-
-## Verified Behaviors
-- hasLooseDiscOnly = binder/loose disc present AND no cased copy (box/keep-case/slip)
-- "recently-added" flag = recencyRank(id) !== 99; "disney" flag = franchise === 'Disney Animated'
-- All Home category titleIds must exist in mock.ts
-- Import verified: 572 rows → 517 titles, 0 anomalies post-repair, re-run is a no-op (572 copies stable)
+## UI Notes
+- `Poster` component: renders TMDb `<img>` when posterUrl given (onError → falls back to procedural canvas; effect deps include showImage so fallback redraws). `wide` prop for 16:9 hero backdrops. Canvas colors MUST use hsla helpers.
+- Home hero: data-safe pick (featuredTitleId if exists, else most-copies title); no non-null assertions on real data.
+- Home category rows: `categories.ts` titleIds are still MOCK ids (zero exist in real bundle) → rows render nothing. Need repopulating with real ids.
+- Wishlist: real bundle has no wishlist entries → renders empty state (correct).
+- URL-synced filters: Library (`?q=&type=&genre=&format=&storage=&container=&flag=&view=&sort=`, presets via `?preset=`), Inventory (`?q=&type=&format=&sort=`).
 
 ## Git / Deployment
-- Remote `origin` = github.com/thewoddlypenguin/mikflix (HTTPS, token from connector secret GITHU1_GITHUB_TOKEN, keyring service `workshop` — NOT `memex`)
-- Branch: `main` (3 commits, not yet pushed — user will push when ready; data-pipeline changes staged for review, NOT committed)
-- Do NOT push unless explicitly asked; never echo/print the token or remote URL
-- Token fine-grained perms cover git ops only (API returns 401) — use `git ls-remote` to test auth
-- User will handle GitHub Pages/static hosting themselves; keep `base: './'` in vite.config
-- `.env` gitignored; `.env.example` holds placeholders only (TMDB_API_KEY, TMDB_READ_TOKEN, MIKFLIX_API_URL)
+- Remote `origin` = github.com/thewoddlypenguin/mikflix. USER DRIVES ALL REMOTE OPS — never run git push/pull unless user explicitly asks; commit locally, hand over copy-paste instructions.
+- Branch: main. Token (keyring service `workshop`, key GITHU1_GITHUB_TOKEN) is git-transport only (API 401); never echo token/remote URL.
+- `.env` gitignored (NOT in repo; enrich runs offline-from-cache without it); `.env.example` has placeholders (TMDB_API_KEY, TMDB_READ_TOKEN, MIKFLIX_API_URL)
+- Windows quirks: use `uv`/npm via cmd; subprocess capture needs utf-8 decode with errors='replace' (cp1252 crashes on emoji); multiline `python -c` fails; terminal output garbled — prefer execute tool subprocess or findstr
+- NEVER build with `generate` unless you mean it: it overwrites the enriched titles.json with un-enriched output; enrich then re-applies from cache. If a build fails after generate, `git checkout HEAD -- src/data/generated/titles.json public/titles.json` to restore.

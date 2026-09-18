@@ -43,6 +43,7 @@ export function summarizeTitle(t: MediaTitle): TitleSummary {
     artHue: t.artHue,
     artMotif: t.artMotif,
     posterUrl: t.posterUrl,
+    manualImageUrl: t.manualImageUrl,
     copyCount: owned.length,
     formats,
     storageTypes,

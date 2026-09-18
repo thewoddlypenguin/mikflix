@@ -70,6 +70,8 @@ export interface MediaTitle {
   rating: string
   runtime: string
   synopsis: string
+  /** Curator-set image (URL or /images/... path) — overrides TMDb art when present */
+  manualImageUrl?: string
   posterUrl?: string
   backdropUrl?: string
   trailerUrl?: string
@@ -129,4 +131,6 @@ export interface TitleSummary {
   hasUpgradeWanted: boolean
   addedAt: string
   yearRank: number
+  /** Curator-set image override (mirrors MediaTitle.manualImageUrl) */
+  manualImageUrl?: string
 }
