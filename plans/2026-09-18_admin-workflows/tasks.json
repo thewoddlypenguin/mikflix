@@ -1,0 +1,27 @@
+[
+  {
+    "content": "[adm-1] types+adapter: map wishlist/genres/overview/rating/condition/ownership from raw; vite-env.d.ts",
+    "id": "adm-1",
+    "status": "completed"
+  },
+  {
+    "content": "[adm-2] API: admin-api.mjs (rename), PUT/POST/DELETE /api/title, tombstones, denorm recompute",
+    "id": "adm-2",
+    "status": "completed"
+  },
+  {
+    "content": "[adm-3] generate: overrides merge (patch/added/deletedIds) + enrich: skip admin-owned fields for patched titles — round-trip verified",
+    "id": "adm-3",
+    "status": "completed"
+  },
+  {
+    "content": "[adm-4] Admin.tsx: password gate (VITE_ADMIN_PASSWORD + sessionStorage) + tabs + inventory editor modal (edit/create/delete with confirmations)",
+    "id": "adm-4",
+    "status": "completed"
+  },
+  {
+    "content": "[adm-5] .env/.env.example (VITE_ADMIN_PASSWORD placeholder); build; API round-trip test incl. edit-survives-build; commit 63bb6cc — push instructions handed to user",
+    "id": "adm-5",
+    "status": "completed"
+  }
+]
