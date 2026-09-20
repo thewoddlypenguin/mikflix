@@ -1,7 +1,7 @@
 {
   "search:babylon-5-movie-set-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:00.334Z"
+    "searched_at": "2026-09-19T05:29:02.749Z"
   },
   "details:tv:3137": {
     "tmdb_id": 3137,
@@ -131,7 +131,7 @@
   },
   "search:babylon-5-the-complete-series-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:03.559Z"
+    "searched_at": "2026-09-19T05:29:03.041Z"
   },
   "details:movie:10942": {
     "tmdb_id": 10942,
@@ -291,11 +291,11 @@
   },
   "search:battlestar-galactica-season-20-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:06.898Z"
+    "searched_at": "2026-09-19T05:29:03.420Z"
   },
   "search:battlestar-galactica-season-25-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:07.325Z"
+    "searched_at": "2026-09-19T05:29:03.763Z"
   },
   "search:battlestar-galactica-season-3-unknown": {
     "tmdb_id": 1972,
@@ -341,7 +341,7 @@
   },
   "search:buffy-the-vampire-slayer-the-complete-series-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:08.928Z"
+    "searched_at": "2026-09-19T05:29:04.074Z"
   },
   "details:tv:9156": {
     "tmdb_id": 9156,
@@ -513,7 +513,7 @@
   },
   "search:firefly-the-complete-series-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:12.748Z"
+    "searched_at": "2026-09-19T05:29:04.359Z"
   },
   "details:tv:19566": {
     "tmdb_id": 19566,
@@ -895,15 +895,15 @@
   },
   "search:scoobydoo-where-are-you-complete-collection-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:21.008Z"
+    "searched_at": "2026-09-19T05:29:04.668Z"
   },
   "search:smallville-the-complete-series-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:21.407Z"
+    "searched_at": "2026-09-19T05:29:04.980Z"
   },
   "search:spartacus-the-complete-series-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:21.832Z"
+    "searched_at": "2026-09-19T05:29:05.290Z"
   },
   "details:tv:5028": {
     "tmdb_id": 5028,
@@ -1203,7 +1203,7 @@
   },
   "search:voltron-defender-of-the-universe-complete-series-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:28.490Z"
+    "searched_at": "2026-09-19T05:29:05.598Z"
   },
   "details:movie:23132": {
     "tmdb_id": 23132,
@@ -1340,15 +1340,15 @@
   },
   "search:300-rise-of-an-empire-3-days-in-hell-2014": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:31.563Z"
+    "searched_at": "2026-09-19T05:29:06.011Z"
   },
   "search:300-rise-of-an-empire-a-new-breed-of-hero-2014": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:32.072Z"
+    "searched_at": "2026-09-19T05:29:06.350Z"
   },
   "search:300-rise-of-an-empire-savage-warships-2014": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:32.591Z"
+    "searched_at": "2026-09-19T05:29:06.684Z"
   },
   "details:movie:12244": {
     "tmdb_id": 12244,
@@ -1682,15 +1682,15 @@
   },
   "search:ai-artificial-intelligence-disc-1-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:38.821Z"
+    "searched_at": "2026-09-19T05:29:06.990Z"
   },
   "search:ai-artificial-intelligence-disc-2-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:39.243Z"
+    "searched_at": "2026-09-19T05:29:07.434Z"
   },
   "search:ai-artificial-intelligence-special-features-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:39.717Z"
+    "searched_at": "2026-09-19T05:29:07.780Z"
   },
   "details:movie:72331": {
     "tmdb_id": 72331,
@@ -1926,7 +1926,7 @@
   },
   "search:alien-anthology-4film-set-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:10:44.080Z"
+    "searched_at": "2026-09-19T05:29:08.161Z"
   },
   "details:movie:395": {
     "tmdb_id": 395,
@@ -2882,7 +2882,7 @@
   },
   "search:baywatch-extended-cut-2017": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:11:01.271Z"
+    "searched_at": "2026-09-19T05:29:08.495Z"
   },
   "details:movie:1281": {
     "tmdb_id": 1281,
@@ -2981,11 +2981,11 @@
   },
   "search:beauty-and-the-beast-live-action-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:11:03.608Z"
+    "searched_at": "2026-09-19T05:29:08.803Z"
   },
   "search:beauty-and-the-beast-signature-1991": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:11:04.117Z"
+    "searched_at": "2026-09-19T05:29:09.172Z"
   },
   "details:movie:4011": {
     "tmdb_id": 4011,
@@ -4283,11 +4283,11 @@
   },
   "search:collateral-disc-1-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:11:27.270Z"
+    "searched_at": "2026-09-19T05:29:09.482Z"
   },
   "search:collateral-disc-2-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:11:27.682Z"
+    "searched_at": "2026-09-19T05:29:09.812Z"
   },
   "details:movie:9602": {
     "tmdb_id": 9602,
@@ -5287,11 +5287,11 @@
   },
   "search:dogville-disc-1-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:11:44.978Z"
+    "searched_at": "2026-09-19T05:29:10.120Z"
   },
   "search:dogville-disc-2-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:11:45.396Z"
+    "searched_at": "2026-09-19T05:29:10.426Z"
   },
   "details:movie:535544": {
     "tmdb_id": 535544,
@@ -5537,7 +5537,7 @@
   },
   "search:empire-two-worlds-collide-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:11:50.263Z"
+    "searched_at": "2026-09-19T05:29:10.738Z"
   },
   "details:movie:9946": {
     "tmdb_id": 9946,
@@ -6970,7 +6970,7 @@
   },
   "search:godzilla-force-of-nature-2014": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:12:16.435Z"
+    "searched_at": "2026-09-19T05:29:11.112Z"
   },
   "details:movie:813029": {
     "tmdb_id": 813029,
@@ -7044,11 +7044,11 @@
   },
   "search:godzilla-monarch-the-muto-file-2014": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:12:18.291Z"
+    "searched_at": "2026-09-19T05:29:11.445Z"
   },
   "search:godzilla-operation-lucky-dragon-2014": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:12:18.788Z"
+    "searched_at": "2026-09-19T05:29:11.822Z"
   },
   "details:movie:1291844": {
     "tmdb_id": 1291844,
@@ -8997,7 +8997,7 @@
   },
   "search:jennifers-body-unrated-2009": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:12:55.041Z"
+    "searched_at": "2026-09-19T05:29:12.162Z"
   },
   "details:movie:49529": {
     "tmdb_id": 49529,
@@ -9347,7 +9347,7 @@
   },
   "search:jurassic-world-dominion-extended-cut-2022": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:13:01.453Z"
+    "searched_at": "2026-09-19T05:29:12.499Z"
   },
   "details:movie:351286": {
     "tmdb_id": 351286,
@@ -10191,15 +10191,15 @@
   },
   "search:lotr-return-of-the-king-appendices-part-5-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:13:16.084Z"
+    "searched_at": "2026-09-19T05:29:12.844Z"
   },
   "search:lotr-return-of-the-king-appendices-part-6-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:13:16.354Z"
+    "searched_at": "2026-09-19T05:29:13.111Z"
   },
   "search:lotr-return-of-the-king-special-features-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:13:16.767Z"
+    "searched_at": "2026-09-19T05:29:13.418Z"
   },
   "details:movie:102651": {
     "tmdb_id": 102651,
@@ -10770,7 +10770,7 @@
   },
   "search:mr-and-mrs-smith-unrated-2005": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:13:26.896Z"
+    "searched_at": "2026-09-19T05:29:13.792Z"
   },
   "details:movie:145220": {
     "tmdb_id": 145220,
@@ -11152,7 +11152,7 @@
   },
   "search:now-you-see-me-extended-2013": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:13:33.893Z"
+    "searched_at": "2026-09-19T05:29:14.133Z"
   },
   "details:movie:75612": {
     "tmdb_id": 75612,
@@ -12029,7 +12029,7 @@
   },
   "search:punchdrunk-love-special-features-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:13:50.235Z"
+    "searched_at": "2026-09-19T05:29:14.482Z"
   },
   "details:movie:13455": {
     "tmdb_id": 13455,
@@ -14202,7 +14202,7 @@
   },
   "search:star-wars-the-complete-saga-episodes-ivi-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:14:28.161Z"
+    "searched_at": "2026-09-19T05:29:14.852Z"
   },
   "details:movie:140607": {
     "tmdb_id": 140607,
@@ -14432,7 +14432,7 @@
   },
   "search:sucker-punch-extended-2011": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:14:32.555Z"
+    "searched_at": "2026-09-19T05:29:15.192Z"
   },
   "details:movie:363676": {
     "tmdb_id": 363676,
@@ -16632,7 +16632,7 @@
   },
   "search:the-jungle-book-live-action-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:15:12.713Z"
+    "searched_at": "2026-09-19T05:29:15.537Z"
   },
   "details:movie:12144": {
     "tmdb_id": 12144,
@@ -16676,7 +16676,7 @@
   },
   "search:the-last-of-the-mohicans-definitive-edition-1992": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:15:13.894Z"
+    "searched_at": "2026-09-19T05:29:15.910Z"
   },
   "details:movie:8698": {
     "tmdb_id": 8698,
@@ -17017,7 +17017,7 @@
   },
   "search:the-lion-king-diamond-edition-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:15:20.091Z"
+    "searched_at": "2026-09-19T05:29:16.215Z"
   },
   "details:movie:10144": {
     "tmdb_id": 10144,
@@ -19058,7 +19058,7 @@
   },
   "search:tmnt-ii-the-secret-of-the-ooze-unknown": {
     "enrichment": null,
-    "searched_at": "2026-09-17T19:15:57.215Z"
+    "searched_at": "2026-09-19T05:29:16.526Z"
   },
   "details:movie:338970": {
     "tmdb_id": 338970,
