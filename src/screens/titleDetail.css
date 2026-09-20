@@ -344,6 +344,135 @@
   font-size: 0.58rem;
 }
 
+/* hero scores (rating / cert) */
+.td-hero__scores {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: -4px;
+}
+
+.td-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  color: var(--ink-hi);
+  background: rgba(18, 13, 11, 0.5);
+}
+
+.td-score--star {
+  color: var(--gold-bright);
+  border-color: rgba(226, 169, 79, 0.45);
+  background: rgba(226, 169, 79, 0.08);
+}
+
+.td-score--cert {
+  color: var(--teal, #6fd3bf);
+  border-color: rgba(94, 200, 184, 0.4);
+  background: rgba(94, 200, 184, 0.07);
+  font-weight: 700;
+}
+
+.td-score--plain {
+  color: var(--ink-mute);
+}
+
+.td-hero__byline {
+  font-size: 0.88rem;
+  color: var(--ink-mute);
+}
+
+.td-hero__byline strong {
+  color: var(--ink-hi);
+  font-weight: 700;
+}
+
+.td-section__icon {
+  vertical-align: -2px;
+  margin-right: 7px;
+  color: var(--gold);
+}
+
+/* trailer */
+.td-trailer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-width: 860px;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  background: #000;
+  box-shadow: var(--shadow-card);
+}
+
+.td-trailer iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* cast row */
+.td-cast {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 4px 2px 14px;
+  scroll-snap-type: x proximity;
+}
+
+.td-cast__card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 108px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+.td-cast__photo {
+  width: 108px;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-card);
+  background: var(--surface-2);
+}
+
+.td-cast__photo--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gold);
+  background: linear-gradient(145deg, rgba(226, 169, 79, 0.14), rgba(226, 169, 79, 0.04));
+}
+
+.td-cast__name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-hi);
+  line-height: 1.25;
+}
+
+.td-cast__char {
+  font-size: 0.66rem;
+  color: var(--ink-faint);
+  line-height: 1.3;
+}
+
 /* missing title */
 .td__missing {
   padding-top: 80px;

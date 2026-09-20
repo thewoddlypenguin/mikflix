@@ -8,6 +8,9 @@ import {
   Pencil,
   ArrowUpNarrowWide,
   TriangleAlert,
+  Star,
+  Clapperboard,
+  Users,
 } from 'lucide-react'
 import { fetchTitles } from '../lib/data-adapter'
 import { summarizeTitle } from '../lib/summaries'
@@ -23,6 +26,7 @@ export function TitleDetail() {
   const navigate = useNavigate()
   const [titles, setTitles] = useState<MediaTitle[]>([])
   const [notFound, setNotFound] = useState(false)
+  const [trailerOpen, setTrailerOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -115,16 +119,58 @@ export function TitleDetail() {
               </p>
               <h1 className="td-hero__title">{title.title}</h1>
               <p className="td-hero__meta mono">
-                {title.year} · {title.rating} · {upper(title.runtime)} ·{' '}
+                {title.year} · {upper(title.runtime)} ·{' '}
                 {title.genres.join(' / ')}
               </p>
+              {(title.rating || title.contentRating) && (
+                <div className="td-hero__scores">
+                  {title.rating && (
+                    <span className="td-score td-score--star">
+                      <Star size={13} />
+                      {title.rating}
+                    </span>
+                  )}
+                  {title.contentRating && (
+                    <span className="td-score td-score--cert">{title.contentRating}</span>
+                  )}
+                  {title.runtime !== 'Unknown' && <span className="td-score td-score--plain">{upper(title.runtime)}</span>}
+                </div>
+              )}
               <p className="td-hero__synopsis">{title.synopsis}</p>
+              {(title.director || (title.creators?.length ?? 0) > 0) && (
+                <p className="td-hero__byline">
+                  {title.director && (
+                    <>Directed by <strong>{title.director}</strong></>
+                  )}
+                  {title.director && (title.creators?.length ?? 0) > 0 && ' · '}
+                  {(title.creators?.length ?? 0) > 0 && (
+                    <>Created by <strong>{title.creators!.join(', ')}</strong></>
+                  )}
+                </p>
+              )}
 
               <div className="td-hero__watchrow">
-                <button className="btn btn--primary">
-                  <Play size={15} />
-                  Watch Trailer
-                </button>
+                {title.trailerUrl ? (
+                  <a
+                    className="btn btn--primary"
+                    href={title.trailerUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={e => {
+                      e.preventDefault()
+                      setTrailerOpen(true)
+                      document.getElementById('td-trailer')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    }}
+                  >
+                    <Play size={15} />
+                    Watch Trailer
+                  </a>
+                ) : (
+                  <button className="btn btn--primary" disabled title="No trailer found on TMDb">
+                    <Play size={15} />
+                    Watch Trailer
+                  </button>
+                )}
                 <div className="td-hero__where">
                   {primaryCopy ? (
                     <>
@@ -210,6 +256,68 @@ export function TitleDetail() {
                 <span className="td-wanted__format mono">{upper(wl.desiredFormat)}</span>
               </div>
               {wl.reason && <p className="td-wanted__reason">“{wl.reason}”</p>}
+            </div>
+          </section>
+        )}
+
+        {/* ============ C. COLLECTOR ACTIONS ============ */}
+        <section className="td-section" aria-label="Trailer">
+          <header className="td-section__head">
+            <h2>
+              <Clapperboard size={15} className="td-section__icon" />
+              Trailer
+            </h2>
+            {title.trailerUrl && (
+              <button
+                className="section-heading__link"
+                style={{ background: 'none', border: 0, cursor: 'pointer', font: 'inherit' }}
+                onClick={() => setTrailerOpen(o => !o)}
+              >
+                {trailerOpen ? 'Hide' : 'Show'}
+              </button>
+            )}
+          </header>
+          {title.trailerUrl ? (
+            trailerOpen ? (
+              <div className="td-trailer">
+                <iframe
+                  src={title.trailerUrl}
+                  title={`${title.title} — trailer`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+            ) : (
+              <p className="td-empty-note">Trailer available — press Show (or Watch Trailer above) to load it.</p>
+            )
+          ) : (
+            <p className="td-empty-note">No trailer found on TMDb for this title.</p>
+          )}
+        </section>
+
+        {title.cast && title.cast.length > 0 && (
+          <section className="td-section" aria-label="Cast">
+            <header className="td-section__head">
+              <h2>
+                <Users size={15} className="td-section__icon" />
+                Top Billed Cast
+              </h2>
+            </header>
+            <div className="td-cast">
+              {title.cast.map((member, i) => (
+                <div key={`${i}-${member.name}`} className="td-cast__card">
+                  {member.profileUrl ? (
+                    <img className="td-cast__photo" src={member.profileUrl} alt={member.name} loading="lazy" />
+                  ) : (
+                    <span className="td-cast__photo td-cast__photo--fallback" aria-hidden="true">
+                      {member.name.split(' ').map(w => w[0]).slice(0, 2).join('')}
+                    </span>
+                  )}
+                  <span className="td-cast__name">{member.name}</span>
+                  {member.character && <span className="td-cast__char">{member.character}</span>}
+                </div>
+              ))}
             </div>
           </section>
         )}

@@ -1,5 +1,4 @@
-import 'dotenv/config'
-import { readFileSync, writeFileSync, existsSync } from 'fs'
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -14,6 +13,23 @@ const PUBLIC_PATH     = join(ROOT, 'public', 'titles.json')
 const CACHE_PATH      = join(__dirname, 'tmdb-cache.json')
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p'
 const RATE_LIMIT_MS   = 250  // ~4 req/s, well under TMDb 40 req/10s limit
+
+// Fields the Admin screen owns — enrichment must never overwrite them.
+const ADMIN_OWNED_FIELDS = new Set([
+  'display_title', 'media_type', 'franchise', 'release_year',
+  'manual_image_url', 'genres', 'overview', 'tagline', 'vote_average', 'runtime',
+  'wishlist',
+])
+
+/** Ids with admin patches — enrichment must not clobber their owned fields. */
+function loadAdminPatchedIds() {
+  const overridesPath = join(ROOT, 'data', 'admin', 'overrides.json')
+  if (!existsSync(overridesPath)) return new Set()
+  try {
+    const ov = JSON.parse(readFileSync(overridesPath, 'utf8'))
+    return new Set(Object.keys(ov.patches ?? {}))
+  } catch { return new Set() }
+}
 
 // ---------------------------------------------------------------------------
 // Auth — prefer bearer token (v4), fall back to API key (v3)
@@ -35,22 +51,6 @@ function loadEnv() {
 const env = loadEnv()
 const BEARER_TOKEN = env.TMDB_READ_TOKEN || process.env.TMDB_READ_TOKEN || ''
 const API_KEY      = env.TMDB_API_KEY    || process.env.TMDB_API_KEY    || ''
-
-const ADMIN_OWNED_FIELDS = new Set([
-  'display_title', 'media_type', 'franchise', 'release_year',
-  'manual_image_url', 'genres', 'overview', 'tagline', 'vote_average', 'runtime',
-  'wishlist',
-])
-
-/** Ids with admin patches — enrichment must not clobber their owned fields. */
-function loadAdminPatchedIds() {
-  const overridesPath = join(ROOT, 'data', 'admin', 'overrides.json')
-  if (!existsSync(overridesPath)) return new Set()
-  try {
-    const ov = JSON.parse(readFileSync(overridesPath, 'utf8'))
-    return new Set(Object.keys(ov.patches ?? {}))
-  } catch { return new Set() }
-}
 
 // Warm the cache before the credential check so a cold clone (no .env) can
 // still rebuild fully from the committed cache without network access.
@@ -115,6 +115,11 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
 // ---------------------------------------------------------------------------
 // Cache
 // ---------------------------------------------------------------------------
+// v1 = base enrichment only. v2 adds trailer_url, cast, content_rating,
+// director/creators. Entries below CACHE_VERSION are treated as missing so
+// they refetch once with append_to_response.
+const CACHE_VERSION = 2
+
 function loadCache() {
   if (!existsSync(CACHE_PATH)) return {}
   try { return JSON.parse(readFileSync(CACHE_PATH, 'utf8')) } catch { return {} }
@@ -165,7 +170,10 @@ async function searchTmdb(title, year, mediaType) {
 
 async function fetchDetails(tmdbId, tmdbMediaType) {
   const endpoint = tmdbMediaType === 'tv' ? `/tv/${tmdbId}` : `/movie/${tmdbId}`
-  return tmdbFetch(endpoint, { language: 'en-US' })
+  const appended = tmdbMediaType === 'tv'
+    ? 'videos,credits,content_ratings'
+    : 'videos,credits,release_dates'
+  return tmdbFetch(endpoint, { language: 'en-US', append_to_response: appended })
 }
 
 function pickBestResult(results, displayTitle, year) {
@@ -195,6 +203,49 @@ function pickBestResult(results, displayTitle, year) {
   return scored[0].score > 0 ? scored[0].result : results[0]
 }
 
+const TMDB_PROFILE_BASE = `${TMDB_IMAGE_BASE}/w185`
+
+/** First YouTube trailer → https://www.youtube.com/embed/{key} */
+function extractTrailer(details) {
+  const videos = details.videos?.results ?? []
+  const trailer =
+    videos.find(v => v.site === 'YouTube' && v.type === 'Trailer' && v.official) ??
+    videos.find(v => v.site === 'YouTube' && v.type === 'Trailer') ??
+    videos.find(v => v.site === 'YouTube' && v.type === 'Teaser')
+  return trailer?.key ? `https://www.youtube.com/embed/${trailer.key}` : null
+}
+
+/** US certification: movies via release_dates, tv via content_ratings. */
+function extractContentRating(details, tmdbMediaType) {
+  if (tmdbMediaType === 'tv') {
+    const us = (details.content_ratings?.results ?? []).find(r => r.iso_3166_1 === 'US')
+    return us?.rating || null
+  }
+  const usEntry = (details.release_dates?.results ?? []).find(r => r.iso_3166_1 === 'US')
+  if (!usEntry) return null
+  for (const rd of usEntry?.release_dates ?? []) {
+    if (rd.certification) return rd.certification
+  }
+  return null
+}
+
+function extractCast(details) {
+  return (details.credits?.cast ?? []).slice(0, 10).map(c => ({
+    name: c.name,
+    character: c.character || c.roles?.[0]?.character || '',
+    ...(c.profile_path ? { profileUrl: `${TMDB_PROFILE_BASE}${c.profile_path}` } : {}),
+  })).filter(c => c.name)
+}
+
+function extractDirector(details) {
+  const director = (details.credits?.crew ?? []).find(c => c.job === 'Director')
+  return director?.name ?? null
+}
+
+function extractCreators(details) {
+  return (details.created_by ?? []).map(c => c.name).filter(Boolean)
+}
+
 function extractEnrichment(details, tmdbMediaType) {
   return {
     overview:      details.overview || null,
@@ -204,12 +255,17 @@ function extractEnrichment(details, tmdbMediaType) {
     poster_path:   details.poster_path || null,
     backdrop_path: details.backdrop_path || null,
     tagline:       details.tagline || null,
+    content_rating: extractContentRating(details, tmdbMediaType),
+    trailer_url:   extractTrailer(details),
+    cast:          extractCast(details),
     ...(tmdbMediaType === 'tv' ? {
       number_of_seasons:  details.number_of_seasons || null,
       number_of_episodes: details.number_of_episodes || null,
       status:             details.status || null,
+      creators:           extractCreators(details),
     } : {
       runtime: details.runtime || null,
+      director: extractDirector(details),
     }),
   }
 }
@@ -218,14 +274,6 @@ function extractEnrichment(details, tmdbMediaType) {
 // Main
 // ---------------------------------------------------------------------------
 async function main() {
-  console.log('🎬 TMDb Enrichment Script')
-  console.log('─'.repeat(50))
-
-  if (!existsSync(TITLES_PATH)) {
-    console.error(`❌  titles.json not found. Run \`npm run generate\` first.`)
-    process.exit(1)
-  }
-
   const bundle = JSON.parse(readFileSync(TITLES_PATH, 'utf8'))
   const titles = bundle.titles
   console.log(`📚 Loaded ${titles.length} titles`)
@@ -238,7 +286,7 @@ async function main() {
   const cache = loadCache()
   console.log(`💾 Cache: ${Object.keys(cache).length} entries`)
 
-  let enriched = 0, skipped = 0, failed = 0, fromCache = 0
+  let enriched = 0, skipped = 0, failed = 0, fromCache = 0, refetched = 0
 
   for (let i = 0; i < titles.length; i++) {
     const title = titles[i]
@@ -256,16 +304,30 @@ async function main() {
     const cacheKey = title.tmdb_id
       ? `details:${title.tmdb_media_type}:${title.tmdb_id}`
       : `search:${title.id}`
+    const cached = cache[cacheKey]
 
-    // Serve from cache if available
-    if (cache[cacheKey]?.enrichment) {
-      assignEnrichment(cache[cacheKey].enrichment)
+    // Serve from cache if available (and current version)
+    if (cached?.enrichment && (cached.cache_version ?? 1) >= CACHE_VERSION) {
+      assignEnrichment(cached.enrichment)
       Object.assign(title, {
-        tmdb_id:         cache[cacheKey].tmdb_id ?? title.tmdb_id,
-        tmdb_media_type: cache[cacheKey].tmdb_media_type ?? title.tmdb_media_type,
+        tmdb_id:         cached.tmdb_id ?? title.tmdb_id,
+        tmdb_media_type: cached.tmdb_media_type ?? title.tmdb_media_type,
       })
       fromCache++
       process.stdout.write(`  ✓ ${label} (cached)\n`)
+      continue
+    }
+
+    // Offline + stale (pre-v2) cache: serve the old enrichment rather than
+    // erroring; with credentials the entry is refetched below instead.
+    if (cached?.enrichment && !BEARER_TOKEN && !API_KEY) {
+      assignEnrichment(cached.enrichment)
+      Object.assign(title, {
+        tmdb_id:         cached.tmdb_id ?? title.tmdb_id,
+        tmdb_media_type: cached.tmdb_media_type ?? title.tmdb_media_type,
+      })
+      fromCache++
+      process.stdout.write(`  ✓ ${label} (cached, pre-v2)\n`)
       continue
     }
 
@@ -319,9 +381,10 @@ async function main() {
       assignEnrichment(enrichment)
 
       const detailKey       = `details:${tmdbMediaType}:${tmdbId}`
-      cache[detailKey]      = { tmdb_id: tmdbId, tmdb_media_type: tmdbMediaType, enrichment, cached_at: new Date().toISOString() }
+      cache[detailKey]      = { tmdb_id: tmdbId, tmdb_media_type: tmdbMediaType, enrichment, cache_version: CACHE_VERSION, cached_at: new Date().toISOString() }
       cache[cacheKey]       = cache[detailKey]
 
+      if (cached?.enrichment) refetched++
       enriched++
     } catch (err) {
       console.error(`  ❌ "${title.display_title}": ${err.message}`)
@@ -332,7 +395,7 @@ async function main() {
   saveCache(cache)
 
   console.log('\n' + '─'.repeat(50))
-  console.log(`✅ Done — enriched: ${enriched} | cached: ${fromCache} | skipped: ${skipped} | failed: ${failed}`)
+  console.log(`✅ Done — enriched: ${enriched} (v2 refetch: ${refetched}) | cached: ${fromCache} | skipped: ${skipped} | failed: ${failed}`)
 
   bundle.schema          = '1.2.0'
   bundle.generated_at    = new Date().toISOString()
@@ -344,6 +407,8 @@ async function main() {
   console.log(`\n📝 Wrote titles.json (schema 1.2.0)`)
   console.log(`   Posters  : ${TMDB_IMAGE_BASE}/w500{poster_path}`)
   console.log(`   Backdrops: ${TMDB_IMAGE_BASE}/w1280{backdrop_path}`)
+  console.log(`   Trailers : https://www.youtube.com/embed/{key}`)
+  console.log(`   Profiles : ${TMDB_IMAGE_BASE}/w185{profile_path}`)
 }
 
 main().catch(err => { console.error('Fatal:', err); process.exit(1) })

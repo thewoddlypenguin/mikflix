@@ -63,6 +63,11 @@ export function summarizeTitle(t: MediaTitle): TitleSummary {
     hasUpgradeWanted: t.wishlist?.wishlistType === 'upgrade',
     addedAt: '', // unused; recency handled via recencyRank
     yearRank: recencyRank(t.id),
+    contentRating: t.contentRating,
+    trailerUrl: t.trailerUrl,
+    cast: t.cast,
+    director: t.director,
+    creators: t.creators,
   }
 }
 

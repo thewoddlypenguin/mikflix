@@ -24,6 +24,14 @@ export type WishlistType =
 
 export type Priority = 'high' | 'medium' | 'low'
 
+/** An actor in the TMDb cast list */
+export interface CastMember {
+  name: string
+  character: string
+  /** TMDb profile image URL (w185); absent → UI renders a placeholder avatar */
+  profileUrl?: string
+}
+
 /**
  * A physical object in the collection (or one that used to be / should be).
  * The future schema will likely separate title / edition / inventory copy /
@@ -78,6 +86,16 @@ export interface MediaTitle {
   backdropUrl?: string
   trailerUrl?: string
   tagline?: string
+  /** TMDb overview (alias of synopsis, kept for parity with the raw bundle) */
+  description?: string
+  /** US certification from TMDb release_dates / content_ratings, e.g. "PG-13" */
+  contentRating?: string
+  /** top-billed cast from TMDb credits */
+  cast?: CastMember[]
+  /** movie-only: first crew member with job === "Director" */
+  director?: string
+  /** tv-only: created_by names */
+  creators?: string[]
   copies: MediaCopy[]
   wishlist?: WishlistEntry
   /** visual identity for procedural poster art */
@@ -136,4 +154,10 @@ export interface TitleSummary {
   yearRank: number
   /** Curator-set image override (mirrors MediaTitle.manualImageUrl) */
   manualImageUrl?: string
+  /** TMDb metadata for detail views */
+  contentRating?: string
+  trailerUrl?: string
+  cast?: CastMember[]
+  director?: string
+  creators?: string[]
 }

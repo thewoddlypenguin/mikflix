@@ -65,6 +65,12 @@ interface RawTitle {
   vote_average?: number | null
   runtime?: number | null
   tagline?: string | null
+  /** TMDb metadata (v2 enrichment) */
+  content_rating?: string | null
+  trailer_url?: string | null
+  cast?: { name: string; character: string; profileUrl?: string }[] | null
+  director?: string | null
+  creators?: string[] | null
   /** admin-managed wishlist entry */
   wishlist?: RawWishlist | null
   copies: RawCopy[]
@@ -231,6 +237,12 @@ function mapTitle(raw: RawTitle): MediaTitle {
     runtime: mapRuntime(raw.runtime),
     synopsis: raw.overview || 'No synopsis available.',
     tagline: raw.tagline ?? undefined,
+    description: raw.overview ?? undefined,
+    contentRating: raw.content_rating ?? undefined,
+    trailerUrl: raw.trailer_url ?? undefined,
+    cast: raw.cast?.length ? raw.cast : undefined,
+    director: raw.director ?? undefined,
+    creators: raw.creators?.length ? raw.creators : undefined,
     posterUrl:
       raw.manual_image_url ?? mapImageUrl(raw.poster_path, POSTER_WIDTH),
     backdropUrl: mapImageUrl(raw.backdrop_path, BACKDROP_WIDTH),
