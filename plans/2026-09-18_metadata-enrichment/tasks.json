@@ -1,0 +1,27 @@
+[
+  {
+    "content": "[t3-1] enrich-tmdb.mjs: append_to_response videos+credits+release_dates/content_ratings; extract contentRating/trailerUrl/cast/director/creators; cache versioning so stale entries refetch once",
+    "id": "t3-1",
+    "status": "completed"
+  },
+  {
+    "content": "[t3-2] types.ts: description, contentRating, cast, director, creators (rating/trailerUrl exist)",
+    "id": "t3-2",
+    "status": "completed"
+  },
+  {
+    "content": "[t3-3] data-adapter.ts: map cast/profileUrl, contentRating, director/creators through to MediaTitle",
+    "id": "t3-3",
+    "status": "completed"
+  },
+  {
+    "content": "[t3-4] TitleDetail.tsx + css: rating+contentRating badges, trailer iframe 16:9, horizontal cast row with avatar fallback, director/creators line",
+    "id": "t3-4",
+    "status": "completed"
+  },
+  {
+    "content": "[t3-5] TMDb creds → enrich (583 v2 refetch) → npm run build → verified dist/dev serve trailer+cast+cert → commit + push instructions",
+    "id": "t3-5",
+    "status": "completed"
+  }
+]
