@@ -291,10 +291,11 @@ export function TitleDetail() {
               <div className="td-trailer" role="document">
                 <iframe
                   src={title.trailerUrl}
-                  title={`${title.title} — trailer`}
+                  title={`${title.title} trailer`}
+                  className="w-full h-full rounded-lg"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
-                  loading="lazy"
+                  referrerPolicy="strict-origin-when-cross-origin"
                 />
               </div>
             ) : (

@@ -239,7 +239,10 @@ function mapTitle(raw: RawTitle): MediaTitle {
     tagline: raw.tagline ?? undefined,
     description: raw.overview ?? undefined,
     contentRating: raw.content_rating ?? undefined,
-    trailerUrl: raw.trailer_url ?? undefined,
+    trailerUrl: raw.trailer_url
+  ? raw.trailer_url.replace('www.youtube.com/embed/', 'www.youtube-nocookie.com/embed/')
+  : undefined,
+
     cast: raw.cast?.length ? raw.cast : undefined,
     director: raw.director ?? undefined,
     creators: raw.creators?.length ? raw.creators : undefined,
