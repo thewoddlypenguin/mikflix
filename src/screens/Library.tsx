@@ -64,7 +64,7 @@ export function Library() {
 
   useEffect(() => {
     let cancelled = false
-    fetch('/titles.json')
+    fetch('/titles.json', { cache: 'no-cache' })
       .then(r => {
         if (!r.ok) throw new Error(`titles.json ${r.status}`)
         return r.json()

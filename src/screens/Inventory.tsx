@@ -123,7 +123,7 @@ export function Inventory() {
   const [bundleSchema, setBundleSchema] = useState<string>('1')
 
   useEffect(() => {
-    fetch('/titles.json')
+    fetch('/titles.json', { cache: 'no-cache' })
       .then(r => r.json())
       .then(d => {
         setInventoryTitles(d.titles ?? [])
