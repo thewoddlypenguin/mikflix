@@ -276,7 +276,7 @@ export function loadTitles(bundle: unknown): MediaTitle[] {
  * every screen that needs the collection at runtime.
  */
 export async function fetchTitles(): Promise<MediaTitle[]> {
-  const res = await fetch('/titles.json')
+const res = await fetch('/titles.json', { cache: 'no-cache' })
   if (!res.ok) throw new Error(`titles.json ${res.status}`)
   const bundle = await res.json()
   return loadTitles(bundle)
