@@ -116,9 +116,10 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
 // Cache
 // ---------------------------------------------------------------------------
 // v1 = base enrichment only. v2 adds trailer_url, cast, content_rating,
-// director/creators. Entries below CACHE_VERSION are treated as missing so
+// director/creators. v3 re-verifies trailer_url via YouTube oEmbed (embeddable
+// candidates only). Entries below CACHE_VERSION are treated as missing so
 // they refetch once with append_to_response.
-const CACHE_VERSION = 2
+const CACHE_VERSION = 3
 
 function loadCache() {
   if (!existsSync(CACHE_PATH)) return {}
@@ -205,14 +206,57 @@ function pickBestResult(results, displayTitle, year) {
 
 const TMDB_PROFILE_BASE = `${TMDB_IMAGE_BASE}/w185`
 
-/** First YouTube trailer → https://www.youtube.com/embed/{key} */
-function extractTrailer(details) {
+/**
+ * YouTube oEmbed check — only videos that answer HTTP 200 are embeddable.
+ * Returns true (embeddable), false (rejected/unavailable), or null when the
+ * check itself failed transiently (network down, rate limit after retry) —
+ * a null verdict must never permanently null a good trailer.
+ */
+async function isEmbeddable(videoKey) {
+  const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${videoKey}`)}&format=json`
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(oembedUrl, { headers: { Accept: 'application/json' } })
+      if (res.status === 200) return true
+      if (res.status === 429 && attempt === 0) {
+        await sleep(2000)
+        continue
+      }
+      // 401/403/404 = disabled embedding, private, or removed video
+      return false
+    } catch (err) {
+      if (attempt === 0) { await sleep(2000); continue }
+      console.warn(`  ⚠️  oEmbed check failed for ${videoKey}: ${err.message}`)
+      return null
+    }
+  }
+  return null
+}
+
+/**
+ * Best YouTube trailer → embed URL, verified embeddable via oEmbed before
+ * being stored. Candidates in preference order: official trailers, other
+ * trailers, teasers (TMDb order within each tier). First candidate that
+ * passes the check wins; a transient/unknown verdict falls back to the top
+ * preference rather than dropping a good URL. Null only when nothing
+ * embeddable is confirmed.
+ */
+async function extractTrailer(details) {
   const videos = details.videos?.results ?? []
-  const trailer =
-    videos.find(v => v.site === 'YouTube' && v.type === 'Trailer' && v.official) ??
-    videos.find(v => v.site === 'YouTube' && v.type === 'Trailer') ??
-    videos.find(v => v.site === 'YouTube' && v.type === 'Teaser')
-  return trailer?.key ? `https://www.youtube.com/embed/${trailer.key}` : null
+  const candidates = [
+    ...videos.filter(v => v.site === 'YouTube' && v.type === 'Trailer' && v.official),
+    ...videos.filter(v => v.site === 'YouTube' && v.type === 'Trailer' && !v.official),
+    ...videos.filter(v => v.site === 'YouTube' && v.type === 'Teaser'),
+  ].filter(v => v.key)
+  if (candidates.length === 0) return null
+
+  const top = candidates[0].key
+  for (const { key } of candidates) {
+    const verdict = await isEmbeddable(key)
+    if (verdict === true) return `https://www.youtube.com/embed/${key}`
+    if (verdict === null && key === top) return `https://www.youtube.com/embed/${top}`
+  }
+  return null
 }
 
 /** US certification: movies via release_dates, tv via content_ratings. */
@@ -246,7 +290,7 @@ function extractCreators(details) {
   return (details.created_by ?? []).map(c => c.name).filter(Boolean)
 }
 
-function extractEnrichment(details, tmdbMediaType) {
+async function extractEnrichment(details, tmdbMediaType) {
   return {
     overview:      details.overview || null,
     vote_average:  details.vote_average ? Math.round(details.vote_average * 10) / 10 : null,
@@ -256,7 +300,7 @@ function extractEnrichment(details, tmdbMediaType) {
     backdrop_path: details.backdrop_path || null,
     tagline:       details.tagline || null,
     content_rating: extractContentRating(details, tmdbMediaType),
-    trailer_url:   extractTrailer(details),
+    trailer_url:   await extractTrailer(details),
     cast:          extractCast(details),
     ...(tmdbMediaType === 'tv' ? {
       number_of_seasons:  details.number_of_seasons || null,
@@ -318,6 +362,24 @@ async function main() {
       continue
     }
 
+    // Stale search entry that already identified the TMDb id + a fresh
+    // details entry for that id exists (e.g. re-run after generate wipes
+    // tmdb_id) — upgrade to the fresh enrichment with zero network calls.
+    // This is what makes version bumps cheap: only ids lacking fresh details
+    // ever hit the API again.
+    if (cached?.enrichment && cached.tmdb_id && !title.tmdb_id) {
+      const det = cache[`details:${cached.tmdb_media_type}:${cached.tmdb_id}`]
+      if (det?.enrichment && (det.cache_version ?? 1) >= CACHE_VERSION) {
+        title.tmdb_id         = cached.tmdb_id
+        title.tmdb_media_type = cached.tmdb_media_type
+        assignEnrichment(det.enrichment)
+        cache[cacheKey] = det
+        fromCache++
+        process.stdout.write(`  ✓ ${label} (details cached)\n`)
+        continue
+      }
+    }
+
     // Offline + stale (pre-v2) cache: serve the old enrichment rather than
     // erroring; with credentials the entry is refetched below instead.
     if (cached?.enrichment && !BEARER_TOKEN && !API_KEY) {
@@ -372,9 +434,24 @@ async function main() {
         process.stdout.write(`  📋 ${label} (id:${tmdbId})...\n`)
       }
 
+      // Fresh details already cached under this id (previous pass, or a
+      // duplicate title sharing the same TMDb entry) — skip the network
+      // entirely and backfill the current cacheKey so future runs hit the
+      // top fast-path even after generate wipes tmdb_id.
+      const freshDetails = cache[`details:${tmdbMediaType}:${tmdbId}`]
+      if (freshDetails?.enrichment && (freshDetails.cache_version ?? 1) >= CACHE_VERSION) {
+        title.tmdb_id         = tmdbId
+        title.tmdb_media_type = tmdbMediaType
+        assignEnrichment(freshDetails.enrichment)
+        cache[cacheKey] = freshDetails
+        fromCache++
+        process.stdout.write(`  ✓ ${label} (details cached)\n`)
+        continue
+      }
+
       await sleep(RATE_LIMIT_MS)
       const details    = await fetchDetails(tmdbId, tmdbMediaType)
-      const enrichment = extractEnrichment(details, tmdbMediaType)
+      const enrichment = await extractEnrichment(details, tmdbMediaType)
 
       title.tmdb_id         = tmdbId
       title.tmdb_media_type = tmdbMediaType
@@ -407,7 +484,7 @@ async function main() {
   console.log(`\n📝 Wrote titles.json (schema 1.2.0)`)
   console.log(`   Posters  : ${TMDB_IMAGE_BASE}/w500{poster_path}`)
   console.log(`   Backdrops: ${TMDB_IMAGE_BASE}/w1280{backdrop_path}`)
-  console.log(`   Trailers : https://www.youtube.com/embed/{key}`)
+  console.log(`   Trailers : https://www.youtube.com/embed/{key} (oEmbed-verified)`)
   console.log(`   Profiles : ${TMDB_IMAGE_BASE}/w185{profile_path}`)
 }
 
