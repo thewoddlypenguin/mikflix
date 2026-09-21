@@ -421,6 +421,18 @@
   border: 0;
 }
 
+.td-trailer__fallback {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--ink-2, #9a9a9a);
+  text-decoration: none;
+}
+
+.td-trailer__fallback:hover {
+  text-decoration: underline;
+}
+
 /* cast row */
 .td-cast {
   display: flex;
