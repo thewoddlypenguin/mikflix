@@ -163,7 +163,12 @@ export function TitleDetail() {
                     onClick={e => {
                       e.preventDefault()
                       setTrailerOpen(true)
-                      document.getElementById('td-trailer')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                      // Defer one frame: React commits the iframe on this
+                      // click's sync flush, so the scroll centers the
+                      // expanded player rather than the collapsed section.
+                      requestAnimationFrame(() => {
+                        document.getElementById('td-trailer')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                      })
                     }}
                   >
                     <Play size={15} />
@@ -265,7 +270,7 @@ export function TitleDetail() {
         )}
 
         {/* ============ C. COLLECTOR ACTIONS ============ */}
-        <section className="td-section" aria-label="Trailer">
+        <section className="td-section" id="td-trailer" aria-label="Trailer">
           <header className="td-section__head">
             <h2>
               <Clapperboard size={15} className="td-section__icon" />
@@ -283,7 +288,7 @@ export function TitleDetail() {
           </header>
           {title.trailerUrl ? (
             trailerOpen ? (
-              <div className="td-trailer">
+              <div className="td-trailer" role="document">
                 <iframe
                   src={title.trailerUrl}
                   title={`${title.title} — trailer`}
