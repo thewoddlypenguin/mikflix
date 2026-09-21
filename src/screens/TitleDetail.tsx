@@ -74,6 +74,10 @@ export function TitleDetail() {
   const lostCopies = title.copies.filter(c => c.ownershipStatus === 'lost')
   const wl = title.wishlist
   const primaryCopy = owned[0] ?? lostCopies[0]
+  // Data stores embed URLs (the iframe src below). The anchor href must be a
+  // watch URL — YouTube rejects /embed/ links opened directly in a tab, and
+  // watch URLs can't be iframed, so each surface gets the format it needs.
+  const trailerWatchUrl = title.trailerUrl?.replace('youtube.com/embed/', 'youtube.com/watch?v=')
 
   return (
     <div className="td">
@@ -153,7 +157,7 @@ export function TitleDetail() {
                 {title.trailerUrl ? (
                   <a
                     className="btn btn--primary"
-                    href={title.trailerUrl}
+                    href={trailerWatchUrl}
                     target="_blank"
                     rel="noreferrer"
                     onClick={e => {
