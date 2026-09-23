@@ -77,3 +77,21 @@
   display: block;
   border-radius: var(--r-md);
 }
+
+@media (max-width: 600px) {
+  .library__grid--titles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px 8px;
+  }
+
+  .library__grid--titles img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+    .movie-card,
+  .poster-card {
+    min-width: 0;
+    width: 100%;
+  }
+}
